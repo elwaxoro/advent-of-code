@@ -17,8 +17,9 @@ class Dec07 : PuzzleDayTester(7, 2022) {
      * Pick the smallest one for deletion
      */
     override fun part2(): Any = loader().let { root ->
-        val spaceRequired = maxOf(0, 30000000 - (70000000 - root.calcSize()))
-        root.findDirs().filter { it.size >= spaceRequired }.minOf { it.size }
+        maxOf(0, 30000000 - (70000000 - root.calcSize())).let { spaceRequired ->
+            root.findDirs().map { it.calcSize() }.filter { it >= spaceRequired }.min()
+        }
     }// == 3696336L
 
     /**
