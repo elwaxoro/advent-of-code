@@ -10,16 +10,7 @@ class Dec07 : PuzzleDayTester(7, 2022) {
     /**
      * Find directories with total size less than 100000 and add them up
      */
-    override fun part1(): Any = loader().let { root ->
-        root.findDirs().sumOf {
-            val size = it.calcSize()
-            if (size <= 100000) {
-                size
-            } else {
-                0
-            }
-        }
-    }// == 1582412L
+    override fun part1(): Any = loader().findDirs().map { it.calcSize() }.filter { it <= 100000 }.sum()// == 1582412L
 
     /**
      * Find directories >= the space required for the upgrade file
