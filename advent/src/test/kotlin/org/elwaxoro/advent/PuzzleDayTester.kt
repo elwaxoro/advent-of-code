@@ -13,7 +13,7 @@ import kotlin.test.assertNotEquals
  * part1Answer and part2Answer are optional, if you want to keep track of correct
  * answers during refactoring or whatever other weird stuff you're getting up to in here
  */
-abstract class PuzzleDayTester(val day: Int, val year: Int, val part1Answer: Any? = null, val part2Answer: Any? = null) {
+abstract class PuzzleDayTester(val day: Int, val year: Int, var part1Answer: Any? = null, var part2Answer: Any? = null) {
 
     /**
      * Part1: Extend me!
