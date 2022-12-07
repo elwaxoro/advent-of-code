@@ -7,7 +7,7 @@ import org.elwaxoro.advent.splitToInt
 /**
  * Day 8: Space Image Format
  */
-class Dec08 : PuzzleDayTester(8, 2019) {
+class Dec08 : PuzzleDayTester(8, 2019, 2975) {
 
     /**
      * Loader already split everything into layers (list of list)

@@ -5,7 +5,7 @@ import org.elwaxoro.advent.*
 /**
  * Day 3: Crossed Wires
  */
-class Dec03: PuzzleDayTester(3, 2019) {
+class Dec03: PuzzleDayTester(3, 2019, 260, 15612) {
 
     private val start = Coord(0,0,'o')
 
@@ -14,7 +14,7 @@ class Dec03: PuzzleDayTester(3, 2019) {
         val wire2 = wires.last().toSegments()
         val intersections = wire1.intersections(wire2, setOf(start))
         intersections.minOf { it.taxiDistance(start) }
-    }// == 260
+    }
 
     override fun part2(): Any = load().map { it.split(",") }.let { wires ->
         val wire1 = wires.first().toSegments()
@@ -25,7 +25,7 @@ class Dec03: PuzzleDayTester(3, 2019) {
         listOf(wire1map, wire2map).merge { value, existing ->
             value + (existing ?: 0)
         }.minOf { it.value }
-    }// == 15612
+    }
 
     private fun wireIntersectCostMap(wire: List<Coord>, intersections: Set<Coord>): Map<Coord, Int> {
         val costMap = mutableMapOf<Coord, Int>()

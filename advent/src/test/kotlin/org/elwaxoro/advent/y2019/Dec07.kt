@@ -10,7 +10,7 @@ import org.elwaxoro.advent.permutations
 /**
  * Day 7: Amplification Circuit
  */
-class Dec07 : PuzzleDayTester(7, 2019) {
+class Dec07 : PuzzleDayTester(7, 2019, 79723, 70602018) {
 
     /**
      * Create all permutations of the list [0,1,2,3,4], then find the max of running each list
@@ -22,7 +22,7 @@ class Dec07 : PuzzleDayTester(7, 2019) {
                 compy.run(listOf(setting, acc))
             }
         }
-    }// == 79723
+    }
 
     private class Dec7Part1Compy(program: List<Int>) : Intercode(program) {
         @OptIn(ExperimentalCoroutinesApi::class)
@@ -73,5 +73,5 @@ class Dec07 : PuzzleDayTester(7, 2019) {
             // collect the final amp E output
             outputMap["E"]!!.receive()
         }
-    }// == 70602018
+    }
 }

@@ -8,9 +8,9 @@ import org.elwaxoro.advent.PuzzleDayTester
  * Day 2: 1202 Program Alarm
  * Note: abstracted / refactored the intercode computer after Dec05 expanded it
  */
-class Dec02 : PuzzleDayTester(2, 2019) {
+class Dec02 : PuzzleDayTester(2, 2019, 2782414, 9820) {
 
-    override fun part1(): Any = Dec2Compy(loadToInt(delimiter = ",")).run(12, 2) == 2782414
+    override fun part1(): Any = Dec2Compy(loadToInt(delimiter = ",")).run(12, 2)
 
     /**
      * Inspection of a few manual runs shows:
@@ -28,7 +28,7 @@ class Dec02 : PuzzleDayTester(2, 2019) {
         }
         noun--
         verb = 1 + target - computer.run(noun, verb)
-        return 100 * noun + verb == 9820
+        return 100 * noun + verb
     }
 
     /**
