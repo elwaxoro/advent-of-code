@@ -4,8 +4,16 @@ import org.elwaxoro.advent.PuzzleDayTester
 import org.elwaxoro.advent.padTo
 import org.elwaxoro.advent.splitToInt
 
+/**
+ * Day 8: Space Image Format
+ */
 class Dec08 : PuzzleDayTester(8, 2019) {
 
+    /**
+     * Loader already split everything into layers (list of list)
+     * so this check is dumber than it has to be, would be easier
+     * to just load the layer as a single list
+     */
     override fun part1(): Any = loader(25, 6).minBy { layer ->
         layer.sumOf { it.count { it == 0 } }
     }.let { layerWithAllTheZeroes ->
@@ -14,6 +22,10 @@ class Dec08 : PuzzleDayTester(8, 2019) {
         ones * twos
     }// == 2975
 
+    /**
+     * Create a destination image, then replace transparent pixels with
+     * the first valid color encountered
+     */
     override fun part2(): Any = loader(25, 6).let { layers ->
         val image = (0..5).map {
             listOf(2).padTo(25).toMutableList()
