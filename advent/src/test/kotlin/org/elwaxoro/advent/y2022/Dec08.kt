@@ -27,10 +27,6 @@ class Dec08: PuzzleDayTester(8, 2022) {
         visible.sumOf { it.sum() }
     }
 
-    /**
-     * Let's find the tree with the best visibility for this here tree house
-     * Aren't we supposed to be finding a starfruit tree for santa???
-     */
     private fun List<List<Int>>.lookAtTrees(rows: IntProgression, cols: IntProgression, visible: List<MutableList<Int>>) {
         rows.forEach { row ->
             var max = -1
@@ -55,6 +51,10 @@ class Dec08: PuzzleDayTester(8, 2022) {
         }
     }
 
+    /**
+     * Let's find the tree with the best visibility for this here tree house
+     * Aren't we supposed to be finding a starfruit tree for santa???
+     */
     override fun part2(): Any = load().map { it.splitToInt() }.let { trees ->
         val visibility = trees.map {
             listOf(0).padTo(it.size).toMutableList()
