@@ -5,7 +5,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import org.elwaxoro.advent.PuzzleDayTester
+import org.elwaxoro.advent.drainToList
 import org.elwaxoro.advent.permutations
+import org.elwaxoro.advent.toChannel
 
 /**
  * Day 7: Amplification Circuit
@@ -22,7 +24,7 @@ class Dec07 : PuzzleDayTester(7, 2019) {
                 compy.run(listOf(setting, acc))
             }
         }
-    }// == 79723
+    } == 79723
 
     private class Dec7Part1Compy(program: List<Int>) : Intercode(program) {
         @OptIn(ExperimentalCoroutinesApi::class)
@@ -30,11 +32,7 @@ class Dec07 : PuzzleDayTester(7, 2019) {
             val output = Channel<Int>(capacity = Channel.UNLIMITED)
             run(input.toChannel(), output, program.toMutableList())
             // compy might output multiple items, just get the last one
-            var ret = output.receive()
-            while (!output.isClosedForReceive) {
-                ret = output.receive()
-            }
-            ret
+            output.drainToList().last()
         }
     }
 
@@ -73,5 +71,5 @@ class Dec07 : PuzzleDayTester(7, 2019) {
             // collect the final amp E output
             outputMap["E"]!!.receive()
         }
-    }// == 70602018
+    } == 70602018
 }
