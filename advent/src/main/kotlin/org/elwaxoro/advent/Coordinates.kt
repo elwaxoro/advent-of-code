@@ -1,10 +1,6 @@
 package org.elwaxoro.advent
 
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.pow
-import kotlin.math.sqrt
+import kotlin.math.*
 
 /**
  * Cardinal directions
@@ -35,14 +31,17 @@ enum class Dir {
                 Turn.R -> E
                 Turn.L -> W
             }
+
             S -> when (t) {
                 Turn.R -> W
                 Turn.L -> E
             }
+
             E -> when (t) {
                 Turn.R -> S
                 Turn.L -> N
             }
+
             W -> when (t) {
                 Turn.R -> N
                 Turn.L -> S
@@ -183,6 +182,19 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
      * https://en.wikipedia.org/wiki/Taxicab_geometry
      */
     fun taxiDistance(to: Coord): Int = abs(to.x - x) + abs(to.y - y)
+
+    /**
+     * Angle from this coord to that coord, in degrees
+     * 0 degrees is to the right, increasing clockwise from there
+     */
+    fun angleTo(that: Coord): Double {
+        val angle = Math.toDegrees(atan2(that.y.toDouble() - y, that.x.toDouble() - x))
+        return if (angle < 0) {
+            angle + 360
+        } else {
+            angle
+        }
+    }
 }
 
 /**
@@ -262,19 +274,19 @@ fun Collection<Coord>.printify(full: Char = '#', empty: Char = '.', invert: Bool
     val ytranslate = 0 - ys.first()
 
     return "[${xs.first()},${ys.first()}] to [${xs.last()},${ys.last()}]\n" +
-        (0..(ys.last() - ys.first())).map {
-            MutableList(xs.last() - xs.first() + 1) { empty }
-        }.also { screen ->
-            forEach { coord ->
-                screen[coord.y + ytranslate][coord.x + xtranslate] = coord.d ?: full
-            }
-        }.let {
-            if (invert) {
-                it.reversed()
-            } else {
-                it
-            }
-        }.joinToString("\n") { it.joinToString("") }
+            (0..(ys.last() - ys.first())).map {
+                MutableList(xs.last() - xs.first() + 1) { empty }
+            }.also { screen ->
+                forEach { coord ->
+                    screen[coord.y + ytranslate][coord.x + xtranslate] = coord.d ?: full
+                }
+            }.let {
+                if (invert) {
+                    it.reversed()
+                } else {
+                    it
+                }
+            }.joinToString("\n") { it.joinToString("") }
 }
 
 enum class HexDir { E, W, NE, NW, SE, SW }
@@ -332,8 +344,8 @@ fun Bounds3D.enumerateCube(): List<Coord3D> =
 // TODO verify
 fun Bounds3D.contains(that: Coord3D): Boolean =
     min.x <= that.x && max.x >= that.x &&
-        min.y <= that.y && max.y >= that.y &&
-        min.z <= that.z && max.z >= that.x
+            min.y <= that.y && max.y >= that.y &&
+            min.z <= that.z && max.z >= that.x
 
 // TODO verify
 fun Bounds3D.intersects(that: Bounds3D): Boolean =
@@ -351,12 +363,13 @@ fun Bounds3D.intersection(that: Bounds3D): Bounds3D =
  */
 data class Bounds3D(val min: Coord3D, val max: Coord3D) {
     init {
-        check(min.x <= max.x) {"X: ${min.x} must be <= ${max.x} [$this]"}
-        check(min.y <= max.y) {"Y: ${min.y} must be <= ${max.y} [$this]"}
-        check(min.z <= max.z) {"Z: ${min.z} must be <= ${max.z} [$this]"}
+        check(min.x <= max.x) { "X: ${min.x} must be <= ${max.x} [$this]" }
+        check(min.y <= max.y) { "Y: ${min.y} must be <= ${max.y} [$this]" }
+        check(min.z <= max.z) { "Z: ${min.z} must be <= ${max.z} [$this]" }
     }
+
     // TODO verify
-    fun size(): Long = abs(max.x-min.x).toLong() * abs(max.y-min.y) * (max.z-min.z)
+    fun size(): Long = abs(max.x - min.x).toLong() * abs(max.y - min.y) * (max.z - min.z)
 }
 
 /**
