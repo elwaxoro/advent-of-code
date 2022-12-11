@@ -7,7 +7,7 @@ import org.elwaxoro.advent.PuzzleDayTester
  *
  * 1. monke inspects items in list: worry change is defined by op
  * 2. after inspect is relief or part 2 reduction: relief is / 3, part 2 action is % by a common multiple of the testDivisors to keep everything from blowing up
- * 3. monke runs test and throws to another monke
+ * 3. monke runs test and throws everything to other monke
  * 4. repeat
  * 5. count up inspections and multiply the top 2 inspectors (monkey business)
  */
