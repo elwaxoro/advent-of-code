@@ -13,7 +13,7 @@ import org.elwaxoro.advent.PuzzleDayTester
  */
 class Dec11 : PuzzleDayTester(11, 2022) {
 
-    override fun part1(): Any = loader().shake(20) { it / 3 } == 120756L
+    override fun part1(): Any = loader().shake(20) { it / 3 }// == 120756L
 
     override fun part2(): Any = loader().let { barrel ->
         val commonDenominator = barrel.fold(1L) { acc, monke ->
@@ -22,7 +22,7 @@ class Dec11 : PuzzleDayTester(11, 2022) {
         barrel.shake(10000) {
             it % commonDenominator
         }
-    } == 39109444654L
+    }// == 39109444654L
 
     private fun List<Monke>.shake(reps: Int, reducer: (test: Long) -> Long): Long {
         (1..reps).forEach { _ ->
@@ -37,13 +37,13 @@ class Dec11 : PuzzleDayTester(11, 2022) {
     }
 
     data class Monke(
-        val name: Int, // Monkey 0:
-        var items: MutableList<Long>, // Starting items: 79, 98 (worry level for each item)
-        val opIsPlus: Boolean, // Operation: new = old */+ 19 (monke inspect. worry changes)
-        val opAmt: String, // Operation: new = old */+ 19
-        val testDivisor: Long, // Test: divisible by 23 (monke use new worry, throw item to new monke)
-        val testTrue: Int, // If true: throw to monkey 2
-        val testFalse: Int, // If false: throw to monkey 3
+        val name: Int,
+        var items: MutableList<Long>,
+        val opIsPlus: Boolean,
+        val opAmt: String,
+        val testDivisor: Long,
+        val testTrue: Int,
+        val testFalse: Int,
         var inspectCount: Long = 0L,
     ) {
         fun inspect(reducer: (test: Long) -> Long) {
