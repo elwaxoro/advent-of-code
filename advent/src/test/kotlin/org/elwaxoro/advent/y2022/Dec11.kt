@@ -16,11 +16,11 @@ class Dec11 : PuzzleDayTester(11, 2022) {
     override fun part1(): Any = loader().shake(20) { it / 3 }// == 120756L
 
     override fun part2(): Any = loader().let { barrel ->
-        val commonDenominator = barrel.fold(1L) { acc, monke ->
+        val commonMultiple = barrel.fold(1L) { acc, monke ->
             acc * monke.testDivisor
         }
         barrel.shake(10000) {
-            it % commonDenominator
+            it % commonMultiple
         }
     }// == 39109444654L
 
