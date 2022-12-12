@@ -18,6 +18,7 @@ data class Node(
 
     // Misc for various puzzles. Put whatever you want here
     var scratch: Int = 0
+    var coord: Coord? = null
 
     // helpers for dijkstra
     var shortestPath = listOf<Node>()
@@ -39,7 +40,9 @@ data class Node(
 
     /**
      * Dijkstra it up!
-     * This call populates this node and all connected nodes with the shortest path from this node to all other connected nodes
+     * This call populates this node and all connected nodes with the shortest path from all other connected nodes to this node
+     * Output path and cost data are stored in each Node, this Node's path will be empty and cost will be zero
+     * NOTE: if the graph is not sufficiently connected, watch for empty paths and shortest distance = Int.MAX_VALUE
      * DANGER: this is a mutating call so will only really work once for all nodes involved
      */
     fun dijkstra() {
