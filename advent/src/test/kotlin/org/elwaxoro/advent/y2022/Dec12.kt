@@ -12,10 +12,10 @@ class Dec12 : PuzzleDayTester(12, 2022) {
      * All shortest paths to "E" will solve it, path from "S" to "E"'s distance is the answer
      */
     override fun part1(): Any = loader().flatten().let { nodes ->
-        nodes.single { it.name == "E" }.dijkstra()
+        nodes.single { it.name.startsWith("E") }.dijkstra()
         // prints a nice little map with the path on it
         // println(nodes.mapNotNull { it.coord }.plus(nodes.single { it.name == "S" }.shortestPath.map { it.coord!!.copyD(it.coord!!.d!!.uppercaseChar()) }).printify())
-        nodes.single { it.name == "S" }.shortestDistance
+        nodes.single { it.name.startsWith("S") }.shortestDistance
     } == 361
 
     /**
@@ -23,8 +23,8 @@ class Dec12 : PuzzleDayTester(12, 2022) {
      * Part 1 solved this already, just find the "a" with the shortest distance to "E"
      */
     override fun part2(): Any = loader().flatten().let { nodes ->
-        nodes.single { it.name == "E" }.dijkstra()
-        nodes.filter { it.name == "a" }.minOf { start ->
+        nodes.single { it.name.startsWith("E") }.dijkstra()
+        nodes.filter { it.name.startsWith("a") }.minOf { start ->
             start.shortestDistance
         }
     } == 354
@@ -36,7 +36,7 @@ class Dec12 : PuzzleDayTester(12, 2022) {
                 'E' -> 122 // swap E for z's code: 122
                 else -> c.code
             }
-            Node("$c").also {
+            Node("$c[$x,$y]").also {
                 it.scratch = value
                 it.coord = Coord(x, y, c)
             }
