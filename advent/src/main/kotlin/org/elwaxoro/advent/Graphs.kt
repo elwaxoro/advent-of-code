@@ -4,6 +4,8 @@ package org.elwaxoro.advent
  * ad-hoc wrapper class for doing stuff with graphs based purely on
  * what's needed for past challenges with no thought given to future need
  * Nodes connect to other Nodes via edges
+ *
+ * IMPORTANT!!! Node's name must be unique to distinguish it from other nodes
  */
 data class Node(
     val name: String,
