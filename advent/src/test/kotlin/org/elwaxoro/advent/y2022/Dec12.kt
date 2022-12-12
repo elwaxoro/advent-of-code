@@ -14,9 +14,9 @@ class Dec12 : PuzzleDayTester(12, 2022) {
     override fun part1(): Any = loader().flatten().let { nodes ->
         nodes.single { it.name.startsWith("E") }.dijkstra()
         // prints a nice little map with the path on it
-        // println(nodes.mapNotNull { it.coord }.plus(nodes.single { it.name == "S" }.shortestPath.map { it.coord!!.copyD(it.coord!!.d!!.uppercaseChar()) }).printify())
+        // println(nodes.mapNotNull { it.coord }.plus(nodes.single { it.name.startsWith("S") }.shortestPath.map { it.coord!!.copyD(it.coord!!.d!!.uppercaseChar()) }).printify())
         nodes.single { it.name.startsWith("S") }.shortestDistance
-    } == 361
+    }// == 361
 
     /**
      * Again with the Dijkstra!
@@ -27,7 +27,7 @@ class Dec12 : PuzzleDayTester(12, 2022) {
         nodes.filter { it.name.startsWith("a") }.minOf { start ->
             start.shortestDistance
         }
-    } == 354
+    }// == 354
 
     private fun loader() = load().mapIndexed { y, row ->
         row.mapIndexed { x, c ->
