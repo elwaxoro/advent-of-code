@@ -46,6 +46,7 @@ class Dec14 : PuzzleDayTester(14, 2022) {
                     grain = down
                 }
                 if (grain.y >= maxY) {
+                    // fell off the edge
                     justStopAlready = true
                     grainActive = false
                 }
