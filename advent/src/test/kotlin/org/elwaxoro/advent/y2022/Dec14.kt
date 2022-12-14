@@ -13,7 +13,7 @@ class Dec14 : PuzzleDayTester(14, 2022) {
     override fun part2(): Any = loader().addFloor().dropSand()// == 25161
 
     private fun Set<Coord>.dropSand(): Int = this.let { rocks ->
-        val source = Coord(500, 0)
+        val source = Coord(500, 0) // NOTE: if source is given a unique char (like '+') then the grain comparisons below won't work
         val occupied = rocks.toMutableSet()
         val sand = mutableSetOf<Coord>()
         val caveFloor = rocks.maxOf { it.y }
@@ -22,7 +22,7 @@ class Dec14 : PuzzleDayTester(14, 2022) {
 
         var justStopAlready = false
         while (!justStopAlready) {
-            var grain = source.copyD(null)
+            var grain = source
             var grainActive = true
             while (grainActive) {
                 grain = grain.add(0, 1).takeUnless { occupied.contains(it) } // go down
