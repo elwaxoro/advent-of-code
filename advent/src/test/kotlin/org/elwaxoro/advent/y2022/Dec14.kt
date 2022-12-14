@@ -8,9 +8,9 @@ import org.elwaxoro.advent.PuzzleDayTester
  */
 class Dec14 : PuzzleDayTester(14, 2022) {
 
-    override fun part1(): Any = loader().dropSand() == 805
+    override fun part1(): Any = loader().dropSand()// == 805
 
-    override fun part2(): Any = loader().addFloor().dropSand() == 25161
+    override fun part2(): Any = loader().addFloor().dropSand()// == 25161
 
     private fun Set<Coord>.dropSand(): Int = this.let { rocks ->
         val source = Coord(500, 0)
