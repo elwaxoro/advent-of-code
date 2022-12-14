@@ -6,7 +6,7 @@ import org.elwaxoro.advent.PuzzleDayTester
 /**
  * Day 14: Regolith Reservoir
  */
-class Dec14: PuzzleDayTester(14, 2022) {
+class Dec14 : PuzzleDayTester(14, 2022) {
 
     override fun part1(): Any = loader().dropSand() == 805
 
@@ -19,20 +19,20 @@ class Dec14: PuzzleDayTester(14, 2022) {
         val sand = mutableSetOf<Coord>()
         var justStopAlready = false
         val both = rocks.toMutableSet()
-        while(!justStopAlready) {
+        while (!justStopAlready) {
             var grain = source.copyD(null)
             var grainActive = true
-            while(grainActive) {
+            while (grainActive) {
                 val down = grain.add(0, 1)
-                if(both.contains(down)) {
+                if (both.contains(down)) {
                     val left = grain.add(-1, 1)
-                    if(both.contains(left)) {
+                    if (both.contains(left)) {
                         val right = grain.add(1, 1)
-                        if(both.contains(right)) {
+                        if (both.contains(right)) {
                             both.add(grain)
                             sand.add(grain)
                             grainActive = false
-                            if(grain == source) {
+                            if (grain == source) {
                                 // full to the brim!
                                 justStopAlready = true
                             }
@@ -45,7 +45,7 @@ class Dec14: PuzzleDayTester(14, 2022) {
                 } else {
                     grain = down
                 }
-                if(grain.y >= maxY) {
+                if (grain.y >= maxY) {
                     justStopAlready = true
                     grainActive = false
                 }
@@ -57,14 +57,16 @@ class Dec14: PuzzleDayTester(14, 2022) {
 
     private fun Set<Coord>.addFloor(): Set<Coord> {
         val maxY = maxOf { it.y }
-        return this.plus((500-maxY-5..500+maxY+5).map { Coord(it, maxY+2) }).toSet()
+        return this.plus((500 - maxY - 5..500 + maxY + 5).map { Coord(it, maxY + 2) }).toSet()
     }
 
-    private fun loader() = load().map { it.split(" -> ").map(Coord::parse).fold(listOf<Coord>()) { acc, coord ->
-        if(acc.isEmpty()) {
-            acc.plus(coord)
-        } else {
-            acc.plus(acc.last().enumerateLine(coord))
+    private fun loader() = load().map {
+        it.split(" -> ").map(Coord::parse).fold(listOf<Coord>()) { acc, coord ->
+            if (acc.isEmpty()) {
+                acc.plus(coord)
+            } else {
+                acc.plus(acc.last().enumerateLine(coord))
+            }
         }
-    }}.flatten().toSet()
+    }.flatten().toSet()
 }
