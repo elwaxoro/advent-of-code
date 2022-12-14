@@ -23,28 +23,20 @@ class Dec14 : PuzzleDayTester(14, 2022) {
             var grain = source.copyD(null)
             var grainActive = true
             while (grainActive) {
-                val down = grain.add(0, 1)
-                if (both.contains(down)) {
-                    val left = grain.add(-1, 1)
-                    if (both.contains(left)) {
-                        val right = grain.add(1, 1)
-                        if (both.contains(right)) {
-                            both.add(grain)
-                            sand.add(grain)
-                            grainActive = false
-                            if (grain == source) {
-                                // full to the brim!
-                                justStopAlready = true
-                            }
-                        } else {
-                            grain = right
+                grain = grain.add(0, 1).takeUnless { both.contains(it) } // go down
+                    ?: grain.add(-1, 1).takeUnless { both.contains(it) } // go left
+                    ?: grain.add(1, 1).takeUnless { both.contains(it) } // go right
+                    ?: run {
+                        // settled!
+                        both.add(grain)
+                        sand.add(grain)
+                        grainActive = false
+                        if (grain == source) {
+                            // CAVE IS FULL OF SAND!
+                            justStopAlready = true
                         }
-                    } else {
-                        grain = left
+                        grain
                     }
-                } else {
-                    grain = down
-                }
                 if (grain.y >= maxY) {
                     // fell off the edge
                     justStopAlready = true
