@@ -26,8 +26,8 @@ class Dec14 : PuzzleDayTester(14, 2022) {
             var grainActive = true
             while (grainActive) {
                 grain = grain.add(0, 1).takeUnless { occupied.contains(it) } // go down
-                    ?: grain.add(-1, 1).takeUnless { occupied.contains(it) } // go left
-                    ?: grain.add(1, 1).takeUnless { occupied.contains(it) } // go right
+                    ?: grain.add(-1, 1).takeUnless { occupied.contains(it) } // go down + left
+                    ?: grain.add(1, 1).takeUnless { occupied.contains(it) } // go down + right
                     ?: grain.also {
                         // settled!
                         occupied.add(grain)
