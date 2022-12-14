@@ -6,10 +6,19 @@ import org.elwaxoro.advent.PuzzleDayTester
 import kotlin.math.abs
 import kotlin.math.sign
 
+/**
+ * Day 9: Rope Bridge
+ */
 class Dec09 : PuzzleDayTester(9, 2022) {
 
+    /**
+     * Tail follows head
+     */
     override fun part1(): Any = loader().followMe().distinct().size == 5513
 
+    /**
+     * Create successive tails that each follow the previous tail till the final tail is produced
+     */
     override fun part2(): Any = loader().let { headPath ->
         (0..8).fold(headPath) { prevPath, _ ->
             prevPath.followMe()
