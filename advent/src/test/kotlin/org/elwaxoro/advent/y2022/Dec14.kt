@@ -47,7 +47,7 @@ class Dec14 : PuzzleDayTester(14, 2022) {
                 }
             }
         }
-         println(rocks.plus(source.copyD('+')).plus(sand.map { it.copyD('o') }).printify())
+        // println(rocks.plus(source.copyD('+')).plus(sand.map { it.copyD('o') }).printify())
         sand.size
     }
 
