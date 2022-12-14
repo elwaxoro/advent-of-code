@@ -16,11 +16,11 @@ class Dec14 : PuzzleDayTester(14, 2022) {
         val source = Coord(500, 0)
         val occupied = rocks.toMutableSet()
         val sand = mutableSetOf<Coord>()
+        val caveFloor = rocks.maxOf { it.y }
 
         // println(rocks.plus(source).printify())
-        val caveFloor = rocks.maxOf { it.y }
-        var justStopAlready = false
 
+        var justStopAlready = false
         while (!justStopAlready) {
             var grain = source.copyD(null)
             var grainActive = true
@@ -28,7 +28,7 @@ class Dec14 : PuzzleDayTester(14, 2022) {
                 grain = grain.add(0, 1).takeUnless { occupied.contains(it) } // go down
                     ?: grain.add(-1, 1).takeUnless { occupied.contains(it) } // go left
                     ?: grain.add(1, 1).takeUnless { occupied.contains(it) } // go right
-                    ?: run {
+                    ?: grain.also {
                         // settled!
                         occupied.add(grain)
                         sand.add(grain)
@@ -37,8 +37,8 @@ class Dec14 : PuzzleDayTester(14, 2022) {
                             // CAVE IS FULL OF SAND!
                             justStopAlready = true
                         }
-                        grain
                     }
+
                 if (grain.y >= caveFloor) {
                     // fell off the edge
                     justStopAlready = true
