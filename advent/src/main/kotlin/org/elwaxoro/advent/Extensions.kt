@@ -1,5 +1,7 @@
 package org.elwaxoro.advent
 
+import java.math.BigInteger
+
 /**
  * Nullable Long plusser, null defaults to 0
  */
@@ -82,3 +84,13 @@ fun <T> List<T>.permutations(): List<List<T>> =
             candidates.map { permutation.plus(it) to candidates.minus(it) }
         }
     }.map { it.first }
+
+/**
+ * greatest common factor (GCF, HCF, GCD) for a list
+ */
+fun List<BigInteger>.gcd(): BigInteger = fold(BigInteger.ZERO) { acc, int -> acc.gcd(int) }
+
+/**
+ * least common multiple (LCM, LCD) for a list
+ */
+fun List<BigInteger>.lcm(): BigInteger = fold(BigInteger.ONE) { acc, int -> acc * (int / int.gcd(acc)) }

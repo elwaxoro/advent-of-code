@@ -321,7 +321,9 @@ data class Coord3D(val x: Int = 0, val y: Int = 0, val z: Int = 0, val w: Int = 
         }
     }
 
-    fun subtract(that: Coord3D): Coord3D = Coord3D(x - that.x, y - that.y, z - that.z)
+    fun add(dx: Int, dy: Int, dz: Int): Coord3D = Coord3D(x + dx, y + dy, z + dz, w)
+    fun add(that: Coord3D): Coord3D = Coord3D(x + that.x, y + that.y, z + that.z, w)
+    fun subtract(that: Coord3D): Coord3D = Coord3D(x - that.x, y - that.y, z - that.z, w)
     fun manhattan(that: Coord3D): Int = abs(x - that.x) + abs(y - that.y) + abs(z - that.z)
     fun toMatrix(): Matrix4 = Matrix4(
         1, 0, 0, x,
