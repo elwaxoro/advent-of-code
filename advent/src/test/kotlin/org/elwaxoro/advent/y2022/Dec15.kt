@@ -2,102 +2,50 @@ package org.elwaxoro.advent.y2022
 
 import org.elwaxoro.advent.*
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.test.Test
 
+/**
+ * Day 15: Beacon Exclusion Zone
+ */
 class Dec15 : PuzzleDayTester(15, 2022) {
 
+    /**
+     * Build a layer of the map at Y = 2000000
+     * Count up coverage size, subtract beacons
+     */
     override fun part1(): Any = loader().let { pairs ->
         val beacons = pairs.map { it.last() }.toSet()
         val targetY = 2000000
-        pairs.buildLayer2(2000000).let { mergedRanges ->
-            val bacons = beacons.filter { it.y == targetY }.map { it.x }.count { b -> mergedRanges.any { it.contains(b) } }
-            mergedRanges.single().let {
-                it.last - it.first + 1 - bacons
+        pairs.buildLayer(targetY).let { mergedRanges ->
+            val intersectingBeacons = beacons.filter { it.y == targetY }.map { it.x }.count { b -> mergedRanges.any { it.contains(b) } }
+            mergedRanges.single().let { // from trial and error flailing - there is only a single range at this layer
+                it.last - it.first + 1 - intersectingBeacons
             }
         }
     } == 5367037
 
+    /**
+     * Search from layer 0 to layer 4000000 looking for a gap in coverage (returned ranges > 1)
+     * Should be exactly one of these, and the gap in coverage should be exactly 1 (the x coordinate)
+     */
     override fun part2(): Any = loader().let { pairs ->
         (0..4000000).forEach { targetY ->
-            pairs.buildLayer2(targetY).let {
+            pairs.buildLayer(targetY).let {
                 if (it.size > 1) {
-                    println("FOUND ONE ON LAYER $targetY: $it  [${it.first().last + 1}, $targetY]")
-                    println(((it.first().last + 1) * 4000000L) + targetY)
+                    println("Found a gap on layer $targetY: $it  [${it.first().last + 1}, $targetY]")
+                    return ((it.first().last + 1) * 4000000L) + targetY == 11914583249288L
                 }
             }
         }
-        println("WE DIDNT FIND SHIT")
+        false
     }
-
-    //@Test
-    fun testo() {
-        val abc = "abcdefghikjlmnopqrstuvwxyz"
-        loader().let { pairs ->
-            val sensors = pairs.map { it.first() }.toSet()
-            val beacons = pairs.map { it.last() }.toSet()
-            val zero = Coord(0, 0, '0')
-                val map = pairs.mapIndexed { idx, (sensor, beacon) ->
-                    val dist = sensor.taxiDistance(beacon)
-                    (sensor.y - dist .. sensor.y + dist).map { y ->
-                        val x1 = sensor.x - dist + abs(sensor.y - y)
-                        val x2 = sensor.x + dist - abs(sensor.y - y)
-                        listOf(x1, x2).sorted().let {(it.first() .. it.last())
-
-                        }.map { x ->
-                            Coord(x,y, abc[idx])
-                        }
-                    }.flatten().plus(sensor.copyD(abc[idx].uppercaseChar())).plus(beacon.copyD('B'))
-                }.flatten().plus(sensors.mapIndexed { idx, s -> s.copyD(abc[idx]) }).plus(beacons.map { it.copyD('B') }).plus(zero)
-//            val limits = listOf(Coord(-1, -1, '_'), Coord(21, -1, '_'), Coord(21, 21, '_'), Coord(-1, 21, '_'), Coord(-1, -1, '_')).enumerateLines()
-//            println(map.plus(limits).printify())
-            println(map.printify())
-            val targetY = 3
-            val slice = pairs.buildLayer2(targetY).map { ranges ->
-                ranges.map { Coord(it, targetY, '?') }
-            }.flatten()
-            println(map.plus(slice).printify())
-        }
-    }
-
-    private fun List<List<Coord>>.buildLayer2(targetY: Int) =
-        mapNotNull { (sensor, beacon) ->
-            val dist = sensor.taxiDistance(beacon)
-            if (targetY <= sensor.y + dist && targetY >= sensor.y - dist) {
-//            if (targetY in (sensor.y - targetY..sensor.y + targetY)) {
-                val x1 = sensor.x - dist + abs(sensor.y - targetY)
-                val x2 = sensor.x + dist - abs(sensor.y - targetY)
-
-            (x1 .. x2)
-
-//                if (x1 <= x2 && x2 > 0) {
-//                    (max(0, x1)..min(4000000, x2))
-////                        .also {
-////                        println("sensor $sensor at Y $targetY has range $it")
-////                    }
-//                } else {
-//                    null
-//                }
-//            } else {
-//                null
-//            }
-            } else {
-                null
-            }
-        }.mergeRanges()
 
     private fun List<List<Coord>>.buildLayer(targetY: Int) =
         mapNotNull { (sensor, beacon) ->
             val dist = sensor.taxiDistance(beacon)
-            val targetDistY = targetY - sensor.y
-            if (targetY in (sensor.y - targetY..sensor.y + targetY)) {
-                val left = sensor.add(dist * -1, 0)
-                val right = sensor.add(dist, 0)
-                val leftIntercept = left.add(abs(targetDistY), targetDistY).x
-                val rightIntercept = right.add(abs(targetDistY) * -1, targetDistY).x
-                val range = listOf(leftIntercept, rightIntercept).sorted()
-                (range.first()..range.last())
+            if (targetY <= sensor.y + dist && targetY >= sensor.y - dist) {
+                val x1 = sensor.x - dist + abs(sensor.y - targetY)
+                val x2 = sensor.x + dist - abs(sensor.y - targetY)
+                (x1..x2)
             } else {
                 null
             }
@@ -105,18 +53,14 @@ class Dec15 : PuzzleDayTester(15, 2022) {
 
     private fun List<IntRange>.mergeRanges() = sortedBy { it.first }.fold(listOf<IntRange>()) { acc, range ->
         if (acc.isEmpty()) {
-//            println("Ranges empty! adding $range")
             acc.plus(listOf(range))
         } else {
             val active = acc.last()
             if (active.contains(range.last)) {
-//                println("$active completely contains $range [skip]")
                 acc
             } else if (active.contains(range.first)) {
-//                println("$active overlaps $range [merge]")
                 acc.dropLast(1).plus(listOf(active.first..range.last))
             } else {
-//                println("$active outside range $range [add]")
                 acc.plus(listOf(range))
             }
         }
@@ -125,4 +69,118 @@ class Dec15 : PuzzleDayTester(15, 2022) {
     private fun loader() = load().map {
         it.replace("Sensor at x=", "").replace(" y=", "").split(": closest beacon is at x=").map(Coord::parse)
     }
+
+    /**
+     * Just testing things and making printouts
+     */
+//    @Test
+//    fun testo() {
+//        val abc = "abcdefghikjlmnopqrstuvwxyz"
+//        loader().let { pairs ->
+//            val sensors = pairs.map { it.first() }.toSet()
+//            val beacons = pairs.map { it.last() }.toSet()
+//            val zero = Coord(0, 0, '0')
+//            val map = pairs.mapIndexed { idx, (sensor, beacon) ->
+//                val dist = sensor.taxiDistance(beacon)
+//                (sensor.y - dist..sensor.y + dist).map { y ->
+//                    val x1 = sensor.x - dist + abs(sensor.y - y)
+//                    val x2 = sensor.x + dist - abs(sensor.y - y)
+//                    listOf(x1, x2).sorted().let {
+//                        (it.first()..it.last())
+//
+//                    }.map { x ->
+//                        Coord(x, y, abc[idx])
+//                    }
+//                }.flatten().plus(sensor.copyD(abc[idx].uppercaseChar())).plus(beacon.copyD('B'))
+//            }.flatten().plus(sensors.mapIndexed { idx, s -> s.copyD(abc[idx]) }).plus(beacons.map { it.copyD('B') }).plus(zero)
+//
+//            println(map.printify())
+//            val targetY = 11
+//            val slice = pairs.buildLayer(targetY).map { ranges ->
+//                ranges.map { Coord(it, targetY, 'X') }
+//            }.flatten()
+//            val limits = listOf(Coord(-1, -1, '_'), Coord(21, -1, '_'), Coord(21, 21, '_'), Coord(-1, 21, '_'), Coord(-1, -1, '_')).enumerateLines()
+//            println(map.plus(slice).plus(limits).printify())
+//        }
+//    }
 }
+
+/* Sample sensor / beacon map with coverages (sensor 0 = a, 1 = b, etc)
+..........h..........................
+.........hhh.........................
+........hhhhh........................
+.......hhhhhhh.......................
+......hhhhhhhhh.............n........
+.....hhhhhhhhhhh...........nnn.......
+....hhhhhhhhhhhhh.........nnnnn......
+...hhhhhhhhhhhhhhh.......nnnnnnn.....
+..hhhhhhhhhhhhhhhhh.....nnnnnnnnn....
+.hhhhhhhhhhhhhhhhhhh.c.nnnnnnnnnnn...
+hhhhhhhh0hhhhhhhhhhhhcnnnnnnnnnnnnn..
+.hhhhhhhhhhhhhhhhhhhcnnnnnnnnnnnnnnn.
+..hhhhhhhhhhhhhhhhhggcnnnnnnnnnnnnn..
+...hhhhhhhhhhhhhhhgggmmBnnnnnnnnnn...
+....hhhhhhhhhhhhhgggggmlnnnnnnnnn....
+.....hhhhhhhhhhhgggggllllnnnnnnn.....
+......hhhhhhhhhgggggllllllnnnnn......
+.......hhhhhhhgggggllllllllnnn.......
+........ihhhhgggggggllllllllnkk......
+.......iiihhggggggggglllllllkkkk.....
+......iiiiBggggggggggglllllkkkkkk....
+.....iiiiiiigggggggggg.lllkkkkkkkk...
+......iiiiiagggggggggdkklkkkkkkkkkk..
+.......iiiaaagggggggdkkkkkkkkkkkkkkk.
+.......aiaaaaagggggddkkkkjkkkkkkkkkkk
+......Baaaaaaaagggdffkkkjjjkkkkkkkkk.
+.....aaaaaaaaaaagbBfffkjjjjjkkkkkkk..
+....aaaaaaaaaaaaaffffffjjjjjjkkkkB...
+...aaaaaaaaaaaaaeefffjjjjjjjjjkkk....
+....aaaaaaaaaaaeeeefjjjjjjjjjjjk.....
+.....aaaaaaaaaeeeeejjjjjjjjjjjjj.....
+......aaaaaaaaaeeeeejjjjjjjjjjj......
+.......aaaaaaa..eeeeejjjjjjjjB.......
+........aaaaa....eee..jjjjjjj........
+.........aaa......e....jjjjj.........
+..........a.............jjj..........
+.........................j...........
+ */
+
+/* Sample sensor / beacon map for part2, showing search boundary and the missing beacon on Y = 11
+..........h..........................
+.........hhh.........................
+........hhhhh........................
+.......hhhhhhh.......................
+......hhhhhhhhh.............n........
+.....hhhhhhhhhhh...........nnn.......
+....hhhhhhhhhhhhh.........nnnnn......
+...hhhhhhhhhhhhhhh.......nnnnnnn.....
+..hhhhhhhhhhhhhhhhh.....nnnnnnnnn....
+.hhhhhh_______________________nnnn...
+hhhhhhh_0hhhhhhhhhhhhcnnnnnnn_nnnnn..
+.hhhhhh_hhhhhhhhhhhhcnnnnnnnn_nnnnnn.
+..hhhhh_hhhhhhhhhhhggcnnnnnnn_nnnnn..
+...hhhh_hhhhhhhhhhgggmmBnnnnn_nnnn...
+....hhh_hhhhhhhhhgggggmlnnnnn_nnn....
+.....hh_hhhhhhhhgggggllllnnnn_nn.....
+......h_hhhhhhhgggggllllllnnn_n......
+......._hhhhhhgggggllllllllnn_.......
+......._ihhhhggggggglllllllln_k......
+......._iihhggggggggglllllllk_kk.....
+......i_iiBggggggggggglllllkk_kkk....
+.....XX_XXXXXXXXXXXXXX.XXXXXX_XXXX...
+......i_iiiagggggggggdkklkkkk_kkkkk..
+......._iiaaagggggggdkkkkkkkk_kkkkkk.
+......._iaaaaagggggddkkkkjkkk_kkkkkkk
+......B_aaaaaaagggdffkkkjjjkk_kkkkkk.
+.....aa_aaaaaaaagbBfffkjjjjjk_kkkkk..
+....aaa_aaaaaaaaaffffffjjjjjj_kkkB...
+...aaaa_aaaaaaaaeefffjjjjjjjj_kkk....
+....aaa_aaaaaaaeeeefjjjjjjjjj_jk.....
+.....aa_aaaaaaeeeeejjjjjjjjjj_jj.....
+......a_______________________j......
+.......aaaaaaa..eeeeejjjjjjjjB.......
+........aaaaa....eee..jjjjjjj........
+.........aaa......e....jjjjj.........
+..........a.............jjj..........
+.........................j...........
+ */
