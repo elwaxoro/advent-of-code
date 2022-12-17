@@ -3,6 +3,9 @@ package org.elwaxoro.advent.y2022
 import org.elwaxoro.advent.Node
 import org.elwaxoro.advent.PuzzleDayTester
 
+/**
+ * Day 16: Proboscidea Volcanium
+ */
 class Dec16 : PuzzleDayTester(16, 2022) {
 
     override fun part1(): Any = loader().let { valves ->
