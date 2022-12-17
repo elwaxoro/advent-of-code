@@ -2,22 +2,15 @@ package org.elwaxoro.advent.y2022
 
 import org.elwaxoro.advent.Node
 import org.elwaxoro.advent.PuzzleDayTester
-import kotlin.test.Test
 
 class Dec16 : PuzzleDayTester(16, 2022) {
 
     override fun part1(): Any = loader().let { valves ->
-        var minutes = 30
-        var paths = listOf(Path(valves["AA"]!!, minutes))
-        while (minutes > 0) {
-            paths = paths.flatMap { path ->
+        (1.. 30).fold(listOf(Path(valves["AA"]!!, 30))) { paths, _ ->
+            paths.flatMap { path ->
                 path.openValveAndFanOut()
             }.sortedByDescending { it.maxPotential() }.take(10000)
-            minutes--
-        }
-        println("best path: ${paths.maxBy { it.pressure }}")
-        println("alt calc: ${paths.maxOf { it.maxPotential() }}")
-        paths.maxOf { it.pressure } == 1474L
+        }.maxOf { it.pressure } == 1474L
     }
 
     //@Test
@@ -47,29 +40,32 @@ class Dec16 : PuzzleDayTester(16, 2022) {
     private data class Path(
         val head: Node,
         val time: Int,
-        val opened: Map<Node, Int> = mapOf(),
+        val openValves: Map<Node, Int> = mapOf(),
         val pressure: Long = 0,
         val eleHead: Node? = null,
     ) {
-        fun addPressure(): Path = Path(head, time - 1, opened, pressure + opened.map { it.key.scratch }.sum(), eleHead)
+        fun addPressure(): Path = Path(head, time - 1, openValves, pressure + openValves.map { it.key.scratch }.sum(), eleHead)
 
         fun openLast(): Path {
-            val newPressure = pressure + opened.map { it.key.scratch }.sum()
-            val newMap = opened.plus(head to time - 1)
+            val newPressure = pressure + openValves.map { it.key.scratch }.sum()
+            val newMap = openValves.plus(head to time - 1)
             return Path(head, time - 1, newMap, newPressure, eleHead)
         }
 
         fun move(to: Node): Path {
-            val newPressure = pressure + opened.map { it.key.scratch }.sum()
-            return Path(to, time - 1, opened, newPressure, eleHead)
+            val newPressure = pressure + openValves.map { it.key.scratch }.sum()
+            return Path(to, time - 1, openValves, newPressure, eleHead)
         }
 
-        fun maxPotential(): Long = opened.map { (v, t) -> t * v.scratch }.sum().toLong()
+        /**
+         * turns out, just current pressure isn't enough for a reduction / fitness function
+         */
+        fun maxPotential(): Long = openValves.map { (v, t) -> t * v.scratch }.sum().toLong()
 
         fun fanOut(): List<Path> = head.edges.map { move(it.key) }
 
         fun openValveAndFanOut(): List<Path> {
-            return if (head.scratch > 0 && !opened.containsKey(head)) {
+            return if (head.scratch > 0 && !openValves.containsKey(head)) {
                 listOf(openLast())
             } else {
                 listOf()
