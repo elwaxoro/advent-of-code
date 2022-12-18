@@ -336,34 +336,26 @@ data class Coord3D(val x: Int = 0, val y: Int = 0, val z: Int = 0, val w: Int = 
         0, 0, 1, z,
         0, 0, 0, w
     )
+
+    fun neighbors(): Set<Coord3D> = setOf(
+        Coord3D(x - 1, y, z),
+        Coord3D(x + 1, y, z),
+        Coord3D(x, y + 1, z),
+        Coord3D(x, y - 1, z),
+        Coord3D(x, y, z + 1),
+        Coord3D(x, y, z - 1),
+    )
 }
 
-// TODO verify
-fun Bounds3D.enumerateCube(): List<Coord3D> =
-    (min.x..max.x).flatMap { x ->
-        (min.y..max.y).flatMap { y ->
-            (min.z..max.z).map { z ->
-                Coord3D(x, y, z)
-            }
-        }
-    }
-
-// TODO verify
-fun Bounds3D.contains(that: Coord3D): Boolean =
-    min.x <= that.x && max.x >= that.x &&
-            min.y <= that.y && max.y >= that.y &&
-            min.z <= that.z && max.z >= that.x
-
-// TODO verify
-fun Bounds3D.intersects(that: Bounds3D): Boolean =
-    contains(that.min) || contains(that.max) || that.contains(min) || that.contains(max)
-
-// TODO verify
-fun Bounds3D.intersection(that: Bounds3D): Bounds3D =
-    Bounds3D(
-        min = Coord3D(max(min.x, that.min.x), max(min.y, that.min.y), max(min.z, that.min.z)),
-        max = Coord3D(min(max.x, that.max.x), min(max.y, that.max.y), min(max.z, that.max.z))
-    )
+fun Collection<Coord3D>.bounds(pad: Int = 0): Bounds3D {
+    val maxX = maxOf { it.x } + pad
+    val maxY = maxOf { it.y } + pad
+    val maxZ = maxOf { it.z } + pad
+    val minX = minOf { it.x } - pad
+    val minY = minOf { it.y } - pad
+    val minZ = minOf { it.z } - pad
+    return Bounds3D(Coord3D(minX, minY, minZ), Coord3D(maxX, maxY, maxZ))
+}
 
 /**
  * Basically Pair<Coord3D, Coord3D>
@@ -375,8 +367,32 @@ data class Bounds3D(val min: Coord3D, val max: Coord3D) {
         check(min.z <= max.z) { "Z: ${min.z} must be <= ${max.z} [$this]" }
     }
 
+    fun size(): Long = abs(max.x - min.x).toLong() * abs(max.y - min.y) * abs(max.z - min.z)
+
+    fun contains(coord: Coord3D): Boolean =
+        coord.x <= max.x && coord.x >= min.x
+                && coord.y <= max.y && coord.y >= min.y
+                && coord.z <= max.z && coord.z >= min.z
+
     // TODO verify
-    fun size(): Long = abs(max.x - min.x).toLong() * abs(max.y - min.y) * (max.z - min.z)
+    fun intersects(that: Bounds3D): Boolean = contains(that.min) || contains(that.max) || that.contains(min) || that.contains(max)
+
+    // TODO verify
+    fun intersection(that: Bounds3D): Bounds3D =
+        Bounds3D(
+            min = Coord3D(max(min.x, that.min.x), max(min.y, that.min.y), max(min.z, that.min.z)),
+            max = Coord3D(min(max.x, that.max.x), min(max.y, that.max.y), min(max.z, that.max.z))
+        )
+
+    // TODO verify
+    fun enumerateCube(): List<Coord3D> =
+        (min.x..max.x).flatMap { x ->
+            (min.y..max.y).flatMap { y ->
+                (min.z..max.z).map { z ->
+                    Coord3D(x, y, z)
+                }
+            }
+        }
 }
 
 /**
