@@ -253,6 +253,11 @@ fun Collection<Coord>.bounds(): Pair<Coord, Coord> {
     return (Coord(xs.first(), ys.first()) to Coord(xs.last(), ys.last()))
 }
 
+fun Iterable<Coord>.maxX(): Int = maxOf { it.x }
+fun Iterable<Coord>.maxY(): Int = maxOf { it.y }
+fun Iterable<Coord>.minX(): Int = minOf { it.x }
+fun Iterable<Coord>.minY(): Int = minOf { it.y }
+
 /**
  * Creates a visual representation of collection of Coords, required for some puzzles
  * If there are duplicates, last in wins
