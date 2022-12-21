@@ -8,20 +8,33 @@ import java.lang.IllegalStateException
  */
 class Dec21 : PuzzleDayTester(21, 2022) {
 
-    override fun part1(): Any = loader().solveForRoot().doMathShit() == 104272990112064
+    /**
+     * Root monkey shout. Computer monkey type that into AOC
+     */
+    override fun part1(): Any = loader().solveForRoot().doTheMonkeyMath() == 104272990112064
 
+    /**
+     * Narrow down the `humn` factor (lol) with a little binary search
+     */
     override fun part2(): Any = loader().toMutableMap().let { initialMap ->
-        var guess = 3220993873000L
+        // 3220993874133 OR 3220993874134
+        var upper = 100000000000000000L
+        var lower = 0L
+        var guess = upper/2
         while(true) {
             initialMap["humn"] = "$guess"
             val (left, _, right) = initialMap.solveForRoot().split(" ")
-            if(guess % 1000 == 0L) {
-                println("guess: $guess yeilds $left == $right? ${left == right} diff ${left.toLong() - right.toLong()}")
-            }
+            val diff = left.toLong() - right.toLong()
             if(left == right) {
                 return guess
+            } else if(diff > 0) {
+                // guess is too low
+                lower = guess
+            } else {
+                // guess is too high
+                upper = guess
             }
-            guess++
+            guess = ((upper-lower)/2) + lower
         }
     }
 
@@ -30,9 +43,7 @@ class Dec21 : PuzzleDayTester(21, 2022) {
         val digitRegex = "-*\\d+".toRegex()
         val root = unsolved.remove("root")!!
         val (rootL, rootO, rootR) = root.split(" ")
-        var counter =0
         while (!solvedMap.containsKey(rootL) || !solvedMap.containsKey(rootR)) {
-            counter++
             val iter = unsolved.entries.iterator()
             while (iter.hasNext()) {
                 val (variable, equation) = iter.next()
@@ -42,7 +53,7 @@ class Dec21 : PuzzleDayTester(21, 2022) {
                 } else {
                     val (left, operator, right) = equation.split(" ")
                     if (left.matches(digitRegex) && right.matches(digitRegex)) {
-                        solvedMap[variable] = equation.doMathShit()
+                        solvedMap[variable] = equation.doTheMonkeyMath()
                         iter.remove()
                     } else {
                         val leftFix = "${solvedMap[left] ?: left}"
@@ -51,17 +62,11 @@ class Dec21 : PuzzleDayTester(21, 2022) {
                     }
                 }
             }
-            if(counter > 1000) {
-                println("giving up something is fucky")
-                println(solvedMap)
-                println(unsolved)
-                return "a + b"
-            }
         }
         "${solvedMap[rootL]} $rootO ${solvedMap[rootR]}"
     }
 
-    private fun String.doMathShit() = split(" ").let { (left, operator, right) ->
+    private fun String.doTheMonkeyMath() = split(" ").let { (left, operator, right) ->
         when (operator) {
             "+" -> left.toLong() + right.toLong()
             "-" -> left.toLong() - right.toLong()
