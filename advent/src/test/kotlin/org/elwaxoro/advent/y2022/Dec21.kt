@@ -15,9 +15,13 @@ class Dec21 : PuzzleDayTester(21, 2022) {
 
     /**
      * Narrow down the `humn` factor (lol) with a little binary search
+     * using Long.MAX_VALUE here caused the search to find some other local minimum that was close to the solution but not exact (diff of like 16)
+     * picked something lower for the upper bound to start with so the program will finish and produce the correct result
+     * answer could be one of two numbers for my input:
+     * 3220993874133 OR 3220993874134
      */
     override fun part2(): Any = loader().toMutableMap().let { initialMap ->
-        // 3220993874133 OR 3220993874134
+
         var upper = 100000000000000000L
         var lower = 0L
         var guess = upper/2
