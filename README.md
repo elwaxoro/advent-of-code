@@ -21,7 +21,7 @@ Input files should go in test/resources based on year and date
 
 Note: input files are totally optional! Only use them if it makes sense for the puzzle you're solving
 
-PuzzleDay has a `load` function to help find them and parse them in a simple way (one string per newline by default)
+PuzzleDayTester has a `load` function to help find them and parse them in a simple way (one string per newline by default)
 
 ```
 load(testNum: Int? = null, delimiter: String = "\n"): List<String>
