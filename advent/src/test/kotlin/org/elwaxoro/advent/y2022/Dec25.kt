@@ -11,7 +11,7 @@ class Dec25 : PuzzleDayTester(25, 2022) {
 
     override fun part1(): Any = load().sumOf { raw ->
         raw.snafuToLong()
-    }.toSnafu() == "2-=2==00-0==2=022=10"
+    }.toSnafu()// == "2-=2==00-0==2=022=10"
 
     override fun part2(): Any = "NO PART 2! MERRY CHRISTMAS!"
 
