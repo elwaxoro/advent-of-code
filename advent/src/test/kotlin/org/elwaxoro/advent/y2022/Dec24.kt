@@ -16,7 +16,7 @@ class Dec24: PuzzleDayTester(24, 2022) {
         val start = Coord(1, max.y + 1, 'S')
         val end = Coord(max.x, 0, 'E')
         seek(start, end, startBlizzard, max).minutes
-    } == 257
+    }// == 257
 
     override fun part2(): Any = loader().let { coords ->
         val startBlizzard = coords.filter { it.d in listOf('>', 'v', '^', '<') }
@@ -24,15 +24,15 @@ class Dec24: PuzzleDayTester(24, 2022) {
         val start = Coord(1, max.y + 1, 'S')
         val end = Coord(max.x, 0, 'E')
         val firstTry = seek(start, end, startBlizzard, max)
-        val secondTry = seek(end, start, firstTry.blizzard.last(), max)
-        val thirdTry = seek(start, end, secondTry.blizzard.last(), max)
+        val secondTry = seek(end, start, firstTry.blizzard, max)
+        val thirdTry = seek(start, end, secondTry.blizzard, max)
         firstTry.minutes + secondTry.minutes + thirdTry.minutes
-    } == 828
+    }// == 828
 
     private fun seek(start: Coord, end: Coord, startBlizzard: List<Coord>, max: Coord): State {
         var blizzard = startBlizzard
         val states = mutableMapOf<Int, State>()
-        states[blizzard.plus(start).hashCode()] = State(start, listOf(blizzard), 0, listOf(start))
+        states[blizzard.plus(start).hashCode()] = State(start, blizzard, 0, listOf(start))
         blizzard = blizzard.moveBlizzard(max)
         var minutes = 1
         var solutions = listOf<State>()
@@ -47,7 +47,7 @@ class Dec24: PuzzleDayTester(24, 2022) {
                     val hash = blizzard.plus(option).hashCode()
                     val prev = states[hash]
                     if (prev == null || prev.minutes > minutes) {
-                        states[hash] = State(option, state.blizzard.plusElement(blizzard), minutes, state.path.plus(option))
+                        states[hash] = State(option, blizzard, minutes, state.path.plus(option))
                     }
                 }
             }
@@ -58,7 +58,7 @@ class Dec24: PuzzleDayTester(24, 2022) {
         return solutions.single()
     }
 
-    private data class State(val dude: Coord, val blizzard: List<List<Coord>>, val minutes: Int, val path: List<Coord>)
+    private data class State(val dude: Coord, val blizzard: List<Coord>, val minutes: Int, val path: List<Coord>)
 
     private fun Coord.equalsCoord(coord: Coord) = x == coord.x && y == coord.y
 
