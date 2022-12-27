@@ -89,11 +89,8 @@ class Dec22 : PuzzleDayTester(22, 2022) {
                     path.add(face.trueCoord(pos))
                 }
             }
-//            println(faces.flatMap { it.value.trueCoords() }.plus(path.map { it.copyD('X') }).plus(trueStart).plus(path.last().copyD('E')).printify(invert = true, empty = ' '))
         }
         val last = path.last().copyD('E')
-        //println(faces.flatMap { it.value.trueCoords() }.plus(path.map { it.copyD('X') }).plus(trueStart).plus(path.last().copyD('E')).printify(invert = true, empty = ' '))
-//        println("final pos: ${path.last()} final facing: $dir")
         val dirScore = when (dir) {
             Dir.N -> 3
             Dir.S -> 1
@@ -103,16 +100,7 @@ class Dec22 : PuzzleDayTester(22, 2022) {
 
         val row = height - last.y // puzzle inverted, so we're looking from top down starting at 1 instead of zero
         val col = last.x + 1 // x counting starts at 1
-//        println("row: $row, col: $col")
         return (row * 1000) + (4 * col) + dirScore
-    }
-
-    fun examplePart2(): Any = faceLoader(faceSize = 4).let { (faces, moves) ->
-        initExample(faces)
-        val size = 4
-        val height = 12
-        val start = Coord(0, 3, '.')
-        runPart2(size, height, start, faces["2,2"]!!, moves)
     }
 
     override fun part2(): Any = faceLoader(faceSize = 50).let { (faces, moves) ->
@@ -153,6 +141,10 @@ class Dec22 : PuzzleDayTester(22, 2022) {
         Scenario(finalCoords, start, moves.loadMoves())
     }
 
+    /**
+     * Part 2 loader chunks the map into squares the size of "faceSize"
+     * Some squares will be entirely empty and should be ignored for purposes of creating the cube
+     */
     private fun faceLoader(faceSize: Int) = load(delimiter = "\n\n").let { (map, moves) ->
         val splitMap = map.split("\n")
         val faceMap = mutableMapOf<String, MutableList<MutableList<Coord>>>()
@@ -175,6 +167,10 @@ class Dec22 : PuzzleDayTester(22, 2022) {
         faces to moves.loadMoves()
     }
 
+    /**
+     * A LOT of manual inspection here
+     * Drew the puzzle input on paper, then cut it out and made a cube to help visualize the way the faces came together
+     */
     private fun initPart2(faces: Map<String, Face>) {
         // 1 (v)
         faces["1,3"]!!.let { f ->
@@ -220,47 +216,6 @@ class Dec22 : PuzzleDayTester(22, 2022) {
         }
     }
 
-    private fun initExample(faces: Map<String, Face>) {
-        // faces [0,0] [1,0] [0,2] [1,2] are all blank
-        println(faces.keys)
-        faces["2,0"]!!.let { f ->
-            f.connections[Dir.N] = Connection(faces["2,1"]!!, Dir.N, rY = true)
-            f.connections[Dir.S] = Connection(faces["0,1"]!!, Dir.N, iX = true)
-            f.connections[Dir.E] = Connection(faces["3,0"]!!, Dir.E, rX = true)
-            f.connections[Dir.W] = Connection(faces["1,1"]!!, Dir.N, sXY = true)
-        }
-        faces["3,0"]!!.let { f ->
-            f.connections[Dir.N] = Connection(faces["2,1"]!!, Dir.W, sXY = true)
-            f.connections[Dir.S] = Connection(faces["0,1"]!!, Dir.E, sXY = true)
-            f.connections[Dir.E] = Connection(faces["2,2"]!!, Dir.W, iY = true)
-            f.connections[Dir.W] = Connection(faces["2,0"]!!, Dir.W, mX = true)
-        }
-        faces["0,1"]!!.let { f ->
-            f.connections[Dir.N] = Connection(faces["2,2"]!!, Dir.S, iX = true)
-            f.connections[Dir.S] = Connection(faces["2,0"]!!, Dir.N, iX = true)
-            f.connections[Dir.E] = Connection(faces["1,1"]!!, Dir.E, rX = true)
-            f.connections[Dir.W] = Connection(faces["3,0"]!!, Dir.N, sXY = true)
-        }
-        faces["1,1"]!!.let { f ->
-            f.connections[Dir.N] = Connection(faces["2,2"]!!, Dir.E, iX = true, rY = true, sXY = true)
-            f.connections[Dir.S] = Connection(faces["2,0"]!!, Dir.E, sXY = true)
-            f.connections[Dir.E] = Connection(faces["2,1"]!!, Dir.E, rX = true)
-            f.connections[Dir.W] = Connection(faces["0,1"]!!, Dir.W, mX = true)
-        }
-        faces["2,1"]!!.let { f ->
-            f.connections[Dir.N] = Connection(faces["2,2"]!!, Dir.N, rY = true)
-            f.connections[Dir.S] = Connection(faces["2,0"]!!, Dir.S, mY = true)
-            f.connections[Dir.E] = Connection(faces["3,0"]!!, Dir.S, sXY = true)
-            f.connections[Dir.W] = Connection(faces["1,1"]!!, Dir.W, mX = true)
-        }
-        faces["2,2"]!!.let { f ->
-            f.connections[Dir.N] = Connection(faces["0,1"]!!, Dir.S, iX = true)
-            f.connections[Dir.S] = Connection(faces["2,1"]!!, Dir.S, mY = true)
-            f.connections[Dir.E] = Connection(faces["3,0"]!!, Dir.W, iY = true)
-            f.connections[Dir.W] = Connection(faces["1,1"]!!, Dir.S, iY = true, mX = true, sXY = true)
-        }
-    }
-
     private fun String.loadMoves(): List<Move> {
         var turn: Turn = Turn.R
         var dist = ""
@@ -286,6 +241,7 @@ class Dec22 : PuzzleDayTester(22, 2022) {
                           val rY: Boolean = false, val mY: Boolean = false, val iY: Boolean = false) {
 
     }
+
     data class Wrap(val coord: Coord, val dir: Dir, val face: Face) {
         fun coordAt(): Coord = face.coords[coord.y][coord.x]
     }
@@ -327,14 +283,11 @@ class Dec22 : PuzzleDayTester(22, 2022) {
             } else {
                 y
             }
-            //println("Wrap! $dir at $coord fx,fy: [$fx,$fy] c $connection")
 
             val target = connection.face.coords[fy][fx]
             return Wrap(target, connection.dir, connection.face)
         }
 
         fun trueCoord(coord: Coord): Coord = Coord(coord.x + (xOffset * size), coord.y + (yOffset * size), coord.d)
-
-        fun trueCoords() = coords.flatMap { row -> row.map { trueCoord(it) } }
     }
 }
