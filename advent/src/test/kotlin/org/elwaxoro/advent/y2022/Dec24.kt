@@ -11,24 +11,16 @@ import java.lang.IllegalStateException
  */
 class Dec24 : PuzzleDayTester(24, 2022) {
 
-    override fun part1(): Any = loader().let { coords ->
-        val startBlizzard = coords.filter { it.d in listOf('>', 'v', '^', '<') }
-        val max = Coord(coords.maxOf { it.x } - 1, coords.maxOf { it.y } - 1)
-        val start = Coord(1, max.y + 1, 'S')
-        val end = Coord(max.x, 0, 'E')
-        seek(start, end, startBlizzard, max).minutes
-    } == 257
+    override fun part1(): Any = loader().let { s ->
+        seek(s.start, s.end, s.blizzard, s.max).minutes
+    }// == 257
 
-    override fun part2(): Any = loader().let { coords ->
-        val startBlizzard = coords.filter { it.d in listOf('>', 'v', '^', '<') }
-        val max = Coord(coords.maxOf { it.x } - 1, coords.maxOf { it.y } - 1)
-        val start = Coord(1, max.y + 1, 'S')
-        val end = Coord(max.x, 0, 'E')
-        val firstTry = seek(start, end, startBlizzard, max)
-        val secondTry = seek(end, start, firstTry.blizzard, max)
-        val thirdTry = seek(start, end, secondTry.blizzard, max)
+    override fun part2(): Any = loader().let { s ->
+        val firstTry = seek(s.start, s.end, s.blizzard, s.max)
+        val secondTry = seek(s.end, s.start, firstTry.blizzard, s.max)
+        val thirdTry = seek(s.start, s.end, secondTry.blizzard, s.max)
         firstTry.minutes + secondTry.minutes + thirdTry.minutes
-    } == 828
+    }// == 828
 
     private fun seek(start: Coord, end: Coord, startBlizzard: List<Coord>, max: Coord): State {
         val states = mutableMapOf(startBlizzard.plus(start).hashCode() to State(start, startBlizzard, 0, listOf(start)))
@@ -83,7 +75,15 @@ class Dec24 : PuzzleDayTester(24, 2022) {
         }
     }
 
+    data class Scenario(val coords: Set<Coord>, val blizzard: List<Coord>, val start: Coord, val end: Coord, val max: Coord)
+
     private fun loader() = load().reversed().mapIndexed { y, row ->
         row.mapIndexed { x, c -> Coord(x, y, c) }
-    }.flatten().toSet()
+    }.flatten().toSet().let { coords ->
+        val startBlizzard = coords.filter { it.d in listOf('>', 'v', '^', '<') }
+        val max = Coord(coords.maxOf { it.x } - 1, coords.maxOf { it.y } - 1)
+        val start = Coord(1, max.y + 1, 'S')
+        val end = Coord(max.x, 0, 'E')
+        Scenario(coords, startBlizzard, start, end, max)
+    }
 }
