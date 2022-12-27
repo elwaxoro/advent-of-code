@@ -195,7 +195,17 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
             angle
         }
     }
+
+    /**
+     * Equals check that ignores 'd' and just compares x,y values
+     */
+    fun equalsCoord(coord: Coord) = x == coord.x && y == coord.y
 }
+
+/**
+ * Contains check that ignores 'd' and just compares x,y values
+ */
+fun Iterable<Coord>.containsCoord(coord: Coord) = any { it.x == coord.x && it.y == coord.y }
 
 /**
  * Creates an in-order list of all coordinates visited by drawing a line from each Coord to the next
