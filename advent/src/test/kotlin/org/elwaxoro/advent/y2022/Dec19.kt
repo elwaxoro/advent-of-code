@@ -2,36 +2,38 @@ package org.elwaxoro.advent.y2022
 
 import org.elwaxoro.advent.PuzzleDayTester
 
+/**
+ * Give up hope looking at this. was refactoring for smarter solvers but didn't keep the original working solver :(
+ */
 class Dec19 : PuzzleDayTester(19, 2022) {
 
-    override fun part1(): Any = loader().map { factory ->
-        val sim = Simulation(factory, 24)
-        val states = (0..24).fold(listOf(sim)) { sims, ctr ->
-            sims.flatMap { it.cycle() }
-                .also { println("after rep $ctr the raw size is ${it.size}") }
-            .filter { sim ->
-                when {
-//                    sim.timeLeft < 2 -> (sim.resources[Resource.GEODE]!! > 0)//.also { println("time left is zero, no geodes") }
-//                    sim.timeLeft < 5 -> (sim.robots[Robot.GEODE_ROBOT]!! > 0)//.also { println("5 mins to go, no geode robot") }
-                    sim.timeLeft < 4 -> (sim.robots[Robot.OBSIDIAN_ROBOT]!! > 0)//.also {println("8 mins to go, no obsidian robot")}
-                    sim.timeLeft < 15 -> (sim.robots[Robot.CLAY_ROBOT]!! > 0)//.also{println("9 mins to go, no clay")}
-                    sim.timeLeft < 16 -> (sim.robots[Robot.ORE_ROBOT]!! > 1)//.also { println("10 mins to go, only 1 ore") }
-                    else -> true
-                }
-            }.also { println("after rep $ctr the filtered size is ${it.size}") }
-                .toSet().also { println("after going down to set size: ${it.size}") }
-                .sortedByDescending { it.potential() }.take(100000)
-        }
-        val best = states.maxBy { it.resources[Resource.GEODE] ?: 0 }
-        val mostGeodes = states.maxOf { it.resources[Resource.GEODE] ?: 0 }
-        println("Max costs: ${factory.maxCostMap}")
-        println("After all reps, states: ${states.size} best: $mostGeodes : $best")
-        factory.name * mostGeodes
-    }.sum()
+    override fun part1(): Any = "lost"
+    override fun part2(): Any = "lost"
 
-    override fun part2(): Any {
-        return super.part2()
-    }
+//        loader().map { factory ->
+//        val sim = Simulation(factory, 24)
+//        val states = (0..24).fold(listOf(sim)) { sims, ctr ->
+//            sims.flatMap { it.cycle() }
+//                .also { println("after rep $ctr the raw size is ${it.size}") }
+//            .filter { sim ->
+//                when {
+////                    sim.timeLeft < 2 -> (sim.resources[Resource.GEODE]!! > 0)//.also { println("time left is zero, no geodes") }
+////                    sim.timeLeft < 5 -> (sim.robots[Robot.GEODE_ROBOT]!! > 0)//.also { println("5 mins to go, no geode robot") }
+//                    sim.timeLeft < 4 -> (sim.robots[Robot.OBSIDIAN_ROBOT]!! > 0)//.also {println("8 mins to go, no obsidian robot")}
+//                    sim.timeLeft < 15 -> (sim.robots[Robot.CLAY_ROBOT]!! > 0)//.also{println("9 mins to go, no clay")}
+//                    sim.timeLeft < 16 -> (sim.robots[Robot.ORE_ROBOT]!! > 1)//.also { println("10 mins to go, only 1 ore") }
+//                    else -> true
+//                }
+//            }.also { println("after rep $ctr the filtered size is ${it.size}") }
+//                .toSet().also { println("after going down to set size: ${it.size}") }
+//                .sortedByDescending { it.potential() }.take(100000)
+//        }
+//        val best = states.maxBy { it.resources[Resource.GEODE] ?: 0 }
+//        val mostGeodes = states.maxOf { it.resources[Resource.GEODE] ?: 0 }
+//        println("Max costs: ${factory.maxCostMap}")
+//        println("After all reps, states: ${states.size} best: $mostGeodes : $best")
+//        factory.name * mostGeodes
+//    }.sum()
 
     private fun loader() = load().map { settings ->
         val (fullName, costs) = settings.split(":")
