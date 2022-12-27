@@ -3,14 +3,31 @@ package org.elwaxoro.advent.y2022
 import org.elwaxoro.advent.Coord
 import org.elwaxoro.advent.Dir
 import org.elwaxoro.advent.PuzzleDayTester
-import org.elwaxoro.advent.printify
 import java.lang.IllegalStateException
 
 /**
  * Day 24: Blizzard Basin
  */
 class Dec24: PuzzleDayTester(24, 2022) {
-    val bliz = listOf('>', 'v', '^', '<')
+
+    override fun part1(): Any = loader().let { coords ->
+        val startBlizzard = coords.filter { it.d in listOf('>', 'v', '^', '<') }
+        val max = Coord(coords.maxOf { it.x } - 1, coords.maxOf { it.y } - 1)
+        val start = Coord(1, max.y + 1, 'S')
+        val end = Coord(max.x, 0, 'E')
+        seek(start, end, startBlizzard, max).minutes
+    } == 257
+
+    override fun part2(): Any = loader().let { coords ->
+        val startBlizzard = coords.filter { it.d in listOf('>', 'v', '^', '<') }
+        val max = Coord(coords.maxOf { it.x } - 1, coords.maxOf { it.y } - 1)
+        val start = Coord(1, max.y + 1, 'S')
+        val end = Coord(max.x, 0, 'E')
+        val firstTry = seek(start, end, startBlizzard, max)
+        val secondTry = seek(end, start, firstTry.blizzard.last(), max)
+        val thirdTry = seek(start, end, secondTry.blizzard.last(), max)
+        firstTry.minutes + secondTry.minutes + thirdTry.minutes
+    } == 828
 
     private fun seek(start: Coord, end: Coord, startBlizzard: List<Coord>, max: Coord): State {
         var blizzard = startBlizzard
@@ -41,65 +58,11 @@ class Dec24: PuzzleDayTester(24, 2022) {
         return solutions.single()
     }
 
-    override fun part1(): Any = loader().let { coords ->
-        val startBlizzard = coords.filter { it.d in bliz }
-        var blizzard = startBlizzard
-        val max = Coord(coords.maxOf { it.x } - 1, coords.maxOf { it.y } - 1)
-        val start = Coord(1, max.y + 1, 'S')
-        val end = Coord(max.x, 0, 'E')
-        val valley = coords.cleanValley()
-        val states = mutableMapOf<Int, State>()
-        states[blizzard.plus(start).hashCode()] = State(start, listOf(blizzard), 0, listOf(start))
-        blizzard = blizzard.moveBlizzard(max)
-        var minutes = 1
-        var solutions = listOf<State>()
-        while(solutions.isEmpty()) {
-            states.values.filter { it.minutes == minutes-1 }.toList().forEach { state ->
-
-                val options = state.dude.neighbors().plus(state.dude).filterNot { blizzard.containsCoord(it) }.filter {
-                    it.inBounds(max) || it.equalsCoord(start) || it.equalsCoord(end)
-                }
-
-                options.forEach { option ->
-                    val hash = blizzard.plus(option).hashCode()
-                    val prev = states[hash]
-                    if (prev == null || prev.minutes > minutes) {
-                        states[hash] = State(option, state.blizzard.plusElement(blizzard), minutes, state.path.plus(option))
-                    }
-                }
-            }
-            solutions = states.values.filter { it.dude.equalsCoord(end) }
-            minutes++
-            blizzard = blizzard.moveBlizzard(max)
-        }
-        println("Found solutions! ${solutions.size}")
-        solutions.single().minutes
-    }
-
-    private fun replay(s: State, b: List<Coord>, max: Coord, valley: List<Coord>) {
-        var blizzard = b
-        s.path.forEachIndexed { index, coord ->
-            println("-------- minute $index violation? ${blizzard.containsCoord(coord)}-------------")
-            println(valley.plus(coord.copyD('X')).plus(blizzard).printify(invert = true))
-//            println("Comparison blizzard")
-//            println(valley.plus(s.blizzard[index]).printify(invert = true))
-            blizzard = blizzard.moveBlizzard(max)
-        }
-    }
-
     private data class State(val dude: Coord, val blizzard: List<List<Coord>>, val minutes: Int, val path: List<Coord>)
 
     private fun Coord.equalsCoord(coord: Coord) = x == coord.x && y == coord.y
 
     private fun Iterable<Coord>.containsCoord(coord: Coord) = any { it.x == coord.x && it.y == coord.y }
-
-    private fun Set<Coord>.cleanValley() = map {
-        if(it.d in bliz) {
-            it.copyD('.')
-        } else {
-            it
-        }
-    }
 
     private fun Coord.inBounds(max: Coord): Boolean = (x > 0 && x <= max.x && y > 0 && y <= max.y)
 
@@ -123,8 +86,6 @@ class Dec24: PuzzleDayTester(24, 2022) {
             n
         }
     }
-
-    override fun part2(): Any = "asdf"
 
     private fun loader() = load().reversed().mapIndexed { y, row ->
         row.mapIndexed { x, c -> Coord(x,y,c) }
