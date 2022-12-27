@@ -2,7 +2,6 @@ package org.elwaxoro.advent.y2022
 
 import org.elwaxoro.advent.*
 import kotlin.math.max
-import kotlin.system.exitProcess
 
 /**
  * Day 22: Monkey Map
@@ -58,11 +57,10 @@ class Dec22 : PuzzleDayTester(22, 2022) {
     private fun List<Coord>.wrapToStart(): Coord = first { it.d != empty }
     private fun List<Coord>.wrapToEnd(): Coord = last { it.d != empty }
 
-    fun runPart2(size: Int, height: Int, start: Coord, startFace: Face, faces: Map<String, Face>, moves: List<Move>): Int {
+    fun runPart2(size: Int, height: Int, start: Coord, startFace: Face, moves: List<Move>): Int {
         var pos = start
         var dir = Dir.N
         var face = startFace
-        val trueStart = face.trueCoord(start).copyD('S')
         val path = mutableListOf(face.trueCoord(start))
         moves.forEach { m ->
             dir = dir.turn(m.turn)
@@ -114,7 +112,7 @@ class Dec22 : PuzzleDayTester(22, 2022) {
         val size = 4
         val height = 12
         val start = Coord(0, 3, '.')
-        runPart2(size, height, start, faces["2,2"]!!, faces, moves)
+        runPart2(size, height, start, faces["2,2"]!!, moves)
     }
 
     override fun part2(): Any = faceLoader(faceSize = 50).let { (faces, moves) ->
@@ -122,7 +120,7 @@ class Dec22 : PuzzleDayTester(22, 2022) {
         val size = 50
         val height = 200
         val start = Coord(0, 49, '.')
-        runPart2(size, height, start, faces["1,3"]!!, faces, moves)
+        runPart2(size, height, start, faces["1,3"]!!, moves)
     } == 195032
 
     /**
