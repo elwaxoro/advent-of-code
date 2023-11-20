@@ -1,5 +1,6 @@
 package org.elwaxoro.advent.y2019
 
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import org.elwaxoro.advent.splitToInt
@@ -11,7 +12,7 @@ import java.lang.IllegalStateException
  * Expanded Dec05 with input / output lists
  * Expanded Dec07 with coroutines and I/O channels to replace input / output lists
  */
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(DelicateCoroutinesApi::class)
 open class Intercode(val program: List<Int>, val name: String = "Compy") {
 
     suspend fun run(input: Channel<Int>, output: Channel<Int>, codes: MutableList<Int> = program.toMutableList()) {

@@ -99,7 +99,7 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
      * List of neighbors in cardinal directions only [N,S,E,W], excluding this coord
      */
     fun neighbors(): List<Coord> =
-        Dir.values().map { move(it) }
+        Dir.entries.map { move(it) }
 
     /**
      * Returns a 3x3 grid with all neighbor coords, including this coord at the center
@@ -322,7 +322,7 @@ data class Hex(val x: Int, val y: Int, val z: Int) {
             HexDir.SW -> Hex(x - 1, y, z + 1)
         }
 
-    fun neighbors(): List<Hex> = HexDir.values().map { move(it) }
+    fun neighbors(): List<Hex> = HexDir.entries.map { move(it) }
 }
 
 /**

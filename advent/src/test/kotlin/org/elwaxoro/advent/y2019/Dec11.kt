@@ -1,5 +1,6 @@
 package org.elwaxoro.advent.y2019
 
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -34,7 +35,7 @@ class Dec11: PuzzleDayTester(11, 2019) {
         1
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(DelicateCoroutinesApi::class)
     fun runTheCompy(startingCoord: Coord): List<Coord> = IntercodeV9(loadToLong(delimiter = ",")).let { compy ->
         runBlocking {
             var pos = startingCoord

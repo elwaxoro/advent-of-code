@@ -1,5 +1,6 @@
 package org.elwaxoro.advent
 
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 
@@ -16,7 +17,7 @@ suspend fun <T> List<T>.toChannel(close: Boolean = true) =
         }
     }
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(DelicateCoroutinesApi::class)
 suspend fun <T> Channel<T>.drainToList(): List<T> =
     mutableListOf<T>().also {
         while (!isClosedForReceive) {

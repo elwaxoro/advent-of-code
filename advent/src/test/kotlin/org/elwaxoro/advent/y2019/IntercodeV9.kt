@@ -1,5 +1,6 @@
 package org.elwaxoro.advent.y2019
 
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import org.elwaxoro.advent.padTo
@@ -15,7 +16,7 @@ import java.lang.IllegalStateException
  *
  * NOTE: this version can only be run once after construction
  */
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(DelicateCoroutinesApi::class)
 open class IntercodeV9(
     val initialMem: List<Long>,
     val name: String = "Compy",
