@@ -55,7 +55,5 @@ class Dec03: PuzzleDayTester(3, 2017)  {
      * welp. being tricky in part 1 doesn't help me here.
      * thinking we need a full generator here
      */
-    override fun part2(): Any {
-        TODO("someday!")
-    }
+    override fun part2(): Any = "Someday!"
 }
