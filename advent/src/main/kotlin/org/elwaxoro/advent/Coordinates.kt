@@ -102,12 +102,12 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
         Dir.entries.map { move(it) }
 
     /**
-     * Returns a 3x3 grid with all neighbor coords, including this coord at the center
+     * Returns a 3x3 grid with all neighbor coords, including this coord at the center if includeSelf is set
      */
-    fun neighbors9(): List<List<Coord>> =
+    fun neighbors9(includeSelf: Boolean = true): List<List<Coord>> =
         listOf(
             listOf(Coord(x - 1, y - 1), Coord(x, y - 1), Coord(x + 1, y - 1)),
-            listOf(Coord(x - 1, y), this, Coord(x + 1, y)),
+            listOfNotNull(Coord(x - 1, y), this.takeIf { includeSelf }, Coord(x + 1, y)),
             listOf(Coord(x - 1, y + 1), Coord(x, y + 1), Coord(x + 1, y + 1))
         )
 
