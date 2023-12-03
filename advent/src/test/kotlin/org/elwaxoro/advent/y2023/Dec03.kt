@@ -17,9 +17,7 @@ class Dec03 : PuzzleDayTester(3, 2023) {
     override fun part1(): Any = loader().let { schematic ->
         schematic.numbers.filter { number ->
             number.coords.any { c ->
-                c.neighbors9(false).flatten().any { n ->
-                    schematic.symbols.contains(n)
-                }
+                c.neighbors9().flatten().any { schematic.symbols.contains(it) }
             }
         }.sumOf { it.number }
     }
@@ -31,11 +29,14 @@ class Dec03 : PuzzleDayTester(3, 2023) {
      * Add up all gear ratios
      */
     override fun part2(): Any = loader().let { schematic ->
+        // find all the * symbols (gears) and copy them without their value
         schematic.printableSymbols.filter { it.d == '*' }.map { it.copyD() }.map { gear ->
+            // find all the numbers that touch this gear
             schematic.numbers.filter { partNumber ->
                 partNumber.coords.any { c ->
-                    c.neighbors9(false).flatten().any { it == gear }
+                    c.neighbors9().flatten().any { it == gear }
                 }
+            // a gear is only REALLY a gear if it touches exactly two numbers
             }.takeIf { it.size == 2 }?.fold(1) { acc, partNumber ->
                 acc * partNumber.number
             } ?: 0
