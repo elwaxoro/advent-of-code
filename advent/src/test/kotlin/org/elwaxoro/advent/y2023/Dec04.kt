@@ -22,8 +22,8 @@ class Dec04 : PuzzleDayTester(4, 2023) {
      * 13261850
      */
     override fun part2(): Any = loader().map { card ->
-        // get the win count for each card
-        card.name to card.actual.filter { card.winning.contains(it) }.size
+        // swap to Pair<card number, win count for the card>
+        card.number to card.actual.filter { card.winning.contains(it) }.size
     }.let { cards ->
         val finalCount: MutableMap<Long, Long> = mutableMapOf()
         // loop backwards, storing each card's final win count as you go
@@ -32,7 +32,7 @@ class Dec04 : PuzzleDayTester(4, 2023) {
             // for each win, increase idx by 1 and see what THAT card's finalCount got, then add everything up!
             finalCount[name] = 0.until(wins).sumOf { idx ->
                 finalCount[name + idx + 1]!!
-            } + 1 // each card counts at least 1, even if it won no extra cards
+            } + 1 // all cards count as at least 1, even if they won no extra cards
         }
         finalCount.values.sum()
     }
@@ -44,7 +44,7 @@ class Dec04 : PuzzleDayTester(4, 2023) {
     }
 
     private data class Card(
-        val name: Long,
+        val number: Long,
         val winning: List<Int>,
         val actual: List<Int>
     )
