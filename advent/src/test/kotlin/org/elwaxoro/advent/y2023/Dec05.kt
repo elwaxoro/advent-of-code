@@ -23,6 +23,7 @@ class Dec05: PuzzleDayTester(5, 2023) {
                     }?.let { matchingRange ->
                         currentNumber = matchingRange.destinationStart + currentNumber - matchingRange.sourceStart
                     }
+                    // always move from source to destination, to iterate through the almanac
                     currentName = entry.destination
                 }
             }
@@ -42,12 +43,12 @@ class Dec05: PuzzleDayTester(5, 2023) {
                 almanac.single { it.source == currentName }.let { entry ->
                     // for each current range, partition into a list of ranges that overlap the entry's ranges, keeping non-overlapping ranges as-is
                     // ranges everywhere are pairs of starting number and size
-                    var pendingRanges = currentRanges
-                    val matchedRanges = mutableListOf<Pair<Long,Long>>()
+                    var pendingSeedRanges = currentRanges
+                    val matchedSeedRanges = mutableListOf<Pair<Long,Long>>()
                     entry.ranges.forEach { range ->
                         val rangeSourceStart = range.sourceStart
                         val rangeSourceEnd = range.sourceStart + range.size - 1
-                        pendingRanges = pendingRanges.flatMap { (pendingStart, pendingSize) ->
+                        pendingSeedRanges = pendingSeedRanges.flatMap { (pendingStart, pendingSize) ->
                             val pendingEnd = pendingStart + pendingSize - 1
                             if (pendingEnd < rangeSourceStart || pendingStart >= rangeSourceEnd) {
                                 // no overlap at all, leave the pending range alone
@@ -59,12 +60,13 @@ class Dec05: PuzzleDayTester(5, 2023) {
                                 val before = (pendingStart to overlap.first - pendingStart).takeIf { pendingStart < overlap.first }
                                 val after = (overlap.second + 1 to pendingEnd - overlap.second).takeIf { pendingEnd > overlap.second }
                                 val destinationOverlap = range.destinationStart + overlap.first - range.sourceStart to overlapSize
-                                matchedRanges.add(destinationOverlap)
+                                matchedSeedRanges.add(destinationOverlap)
                                 listOfNotNull(before, after) // only pass along portions of the range that don't overlap
                             }
                         }
                     }
-                    currentRanges = matchedRanges.plus(pendingRanges)
+                    currentRanges = matchedSeedRanges.plus(pendingSeedRanges)
+                    // always move from source to destination, to iterate through the almanac
                     currentName = entry.destination
                 }
             }
