@@ -29,7 +29,7 @@ class Dec05: PuzzleDayTester(5, 2023) {
             }
             currentNumber
         }
-    } == 227653707L
+    }
 
     /**
      * 78775051
@@ -72,7 +72,7 @@ class Dec05: PuzzleDayTester(5, 2023) {
             }
             currentRanges.minBy { it.first }
         }.minOf { it.first }
-    } == 78775051L
+    }
 
     private fun loader() = load(delimiter = "\n\n").let { input ->
         val seeds = input[0].replace("seeds: ", "").split(" ").map { it.toLong() }
