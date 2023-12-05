@@ -14,21 +14,19 @@ class Dec05: PuzzleDayTester(5, 2023) {
      */
     override fun part1(): Any = loader().let { (seeds, almanac) ->
         seeds.minOf { seed ->
-            var sourceName = "seed"
-            var sourceIdx = seed
-            while (sourceName != "location") {
-                val entry = almanac.single { it.source == sourceName }
-                val range = entry.ranges.find { range ->
-                    range.sourceStart <= sourceIdx && (range.sourceStart + range.length + 1) >= sourceIdx
-                }
-                sourceName = entry.destination
-                if (range != null) {
-                    val offset = sourceIdx - range.sourceStart
-                    val destIdx = range.destinationStart + offset
-                    sourceIdx = destIdx
+            var currentName = "seed"
+            var currentNumber = seed
+            while (currentName != "location") {
+                almanac.single { it.source == currentName }.let { entry ->
+                    entry.ranges.find { range ->
+                        range.sourceStart <= currentNumber && (range.sourceStart + range.size + 1) >= currentNumber
+                    }?.let { matchingRange ->
+                        currentNumber = matchingRange.destinationStart + currentNumber - matchingRange.sourceStart
+                    }
+                    currentName = entry.destination
                 }
             }
-            sourceIdx
+            currentNumber
         }
     } == 227653707L
 
@@ -38,35 +36,39 @@ class Dec05: PuzzleDayTester(5, 2023) {
     override fun part2(): Any = loader().let { (seedRaw, almanac) ->
         val seeds = seedRaw.chunked(2).map { (a, b) -> a to b }
         seeds.map { seedRange ->
-            var sourceName = "seed"
-            var sourceRanges = listOf(seedRange)
-            while (sourceName != "location") {
-                val entry = almanac.single { it.source == sourceName }
-                // for each source range, partition into a list of ranges that overlap the entry's ranges, keeping non-overlapping ranges as-is
-                var pendingRanges = sourceRanges
-                val matchedRanges = mutableListOf<Pair<Long,Long>>()
-                entry.ranges.forEach { range ->
-                    val s2 = range.sourceStart
-                    val e2 = range.sourceStart + range.length - 1
-                    pendingRanges = pendingRanges.flatMap { (s1, size) ->
-                        val e1 = s1 + size - 1
-                        if (e1 < s2 || s1 >= e2) {
-                            listOf(s1 to size) // no overlap at all
-                        } else {
-                            val overlap = max(s1, s2) to min(e1, e2)
-                            val overlapSize = overlap.second - overlap.first
-                            val before = (s1 to overlap.first - s1).takeIf { s1 < overlap.first }
-                            val after = (overlap.second + 1 to e1 - overlap.second).takeIf { e1 > overlap.second }
-                            val destOverlap = range.destinationStart + overlap.first - range.sourceStart to overlapSize
-                            matchedRanges.add(destOverlap)
-                            listOfNotNull(before, after)
+            var currentName = "seed"
+            var currentRanges = listOf(seedRange)
+            while (currentName != "location") {
+                almanac.single { it.source == currentName }.let { entry ->
+                    // for each current range, partition into a list of ranges that overlap the entry's ranges, keeping non-overlapping ranges as-is
+                    // ranges everywhere are pairs of starting number and size
+                    var pendingRanges = currentRanges
+                    val matchedRanges = mutableListOf<Pair<Long,Long>>()
+                    entry.ranges.forEach { range ->
+                        val rangeSourceStart = range.sourceStart
+                        val rangeSourceEnd = range.sourceStart + range.size - 1
+                        pendingRanges = pendingRanges.flatMap { (pendingStart, pendingSize) ->
+                            val pendingEnd = pendingStart + pendingSize - 1
+                            if (pendingEnd < rangeSourceStart || pendingStart >= rangeSourceEnd) {
+                                // no overlap at all, leave the pending range alone
+                                listOf(pendingStart to pendingSize)
+                            } else {
+                                // overlap! calculate it, along with any parts of the pending range that fall off the start or the end
+                                val overlap = max(pendingStart, rangeSourceStart) to min(pendingEnd, rangeSourceEnd)
+                                val overlapSize = overlap.second - overlap.first
+                                val before = (pendingStart to overlap.first - pendingStart).takeIf { pendingStart < overlap.first }
+                                val after = (overlap.second + 1 to pendingEnd - overlap.second).takeIf { pendingEnd > overlap.second }
+                                val destinationOverlap = range.destinationStart + overlap.first - range.sourceStart to overlapSize
+                                matchedRanges.add(destinationOverlap)
+                                listOfNotNull(before, after) // only pass along portions of the range that don't overlap
+                            }
                         }
                     }
+                    currentRanges = matchedRanges.plus(pendingRanges)
+                    currentName = entry.destination
                 }
-                sourceRanges = matchedRanges.plus(pendingRanges)
-                sourceName = entry.destination
             }
-            sourceRanges.minBy { it.first }
+            currentRanges.minBy { it.first }
         }.minOf { it.first }
     } == 78775051L
 
@@ -92,7 +94,7 @@ class Dec05: PuzzleDayTester(5, 2023) {
     private data class Range(
         val destinationStart: Long,
         val sourceStart: Long,
-        val length: Long
+        val size: Long
     ) {
         companion object {
             fun fromString(input: String): Range = input.split(" ").map { it.toLong() }.let { (destination, source, length) ->
