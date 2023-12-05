@@ -61,7 +61,7 @@ class Dec05: PuzzleDayTester(5, 2023) {
                                 val after = (overlap.second + 1 to pendingEnd - overlap.second).takeIf { pendingEnd > overlap.second }
                                 val destinationOverlap = range.destinationStart + overlap.first - range.sourceStart to overlapSize
                                 matchedSeedRanges.add(destinationOverlap)
-                                listOfNotNull(before, after) // only pass along portions of the range that don't overlap
+                                listOfNotNull(before, after) // only pass along portions of the pending seed range that don't overlap
                             }
                         }
                     }
