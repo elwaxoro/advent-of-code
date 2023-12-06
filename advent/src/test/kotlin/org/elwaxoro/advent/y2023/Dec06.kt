@@ -22,15 +22,12 @@ class Dec06 : PuzzleDayTester(6, 2023) {
     }
 
     private fun parse1() = load().map {
-        it.replace("[a-zA-Z:]".toRegex(), "")
-            .trim()
-            .split("\\W+".toRegex())
-            .map { it.toLong() }
+        it.replace("[a-zA-Z:]".toRegex(), "").trim().split("\\W+".toRegex()).map { it.toLong() }
     }.let { (times, distances) ->
         times.zip(distances)
     }
 
     private fun parse2() = load().map {
-        it.replace("[a-zA-Z:\\W]".toRegex(), "").trim().toLong()
+        it.replace("[a-zA-Z:\\W]".toRegex(), "").toLong()
     }
 }
