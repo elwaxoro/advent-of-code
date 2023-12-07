@@ -36,7 +36,7 @@ class Dec07 : PuzzleDayTester(7, 2023) {
         "$rank$converted" to bid
     }.gatherWinnings()
 
-    private fun List<Pair<String, String>>.gatherWinnings() = sortedByDescending { it.first }.mapIndexed { index, (_, bid) -> (index+1) * bid.toLong() }.sum()
+    private fun List<Pair<String, String>>.gatherWinnings() = sortedByDescending { it.first }.mapIndexed { index, (_, bid) -> (index + 1) * bid.toLong() }.sum()
 
     private fun String.scoreHand(): String = groupBy { it }.let { sets ->
         val max = sets.maxOf { it.value.size }
