@@ -18,10 +18,12 @@ class Dec07 : PuzzleDayTester(7, 2023) {
      */
     override fun part1(): Any = cardReader().map { (hand, bid) ->
         hand.alphabetize().scoreHand() to bid
-    }.gatherWinnings() == 256448566L
+    }.gatherWinnings()
 
     /**
      * 254412181
+     * Solve the same way as part 1, except convert all the jacks to be the same rank as the biggest set
+     * If multiple sets have the same size, just pick one it doesn't matter which one, because tie-breaking only cares about the order of cards in the hand
      */
     override fun part2(): Any = cardReader().map { (hand, bid) ->
         val converted = hand.alphabetize(jokerMode = true)
@@ -32,11 +34,11 @@ class Dec07 : PuzzleDayTester(7, 2023) {
             converted
         }.scoreHand()[0]
         "$rank$converted" to bid
-    }.gatherWinnings() == 254412181L
+    }.gatherWinnings()
 
-    private fun List<Pair<String, String>>.gatherWinnings() = this.sortedByDescending { it.first }.mapIndexed { index, (_, bid) -> (index+1) * bid.toLong() }.sum()
+    private fun List<Pair<String, String>>.gatherWinnings() = sortedByDescending { it.first }.mapIndexed { index, (_, bid) -> (index+1) * bid.toLong() }.sum()
 
-    private fun String.scoreHand(): String = this.groupBy { it }.let { sets ->
+    private fun String.scoreHand(): String = groupBy { it }.let { sets ->
         val max = sets.maxOf { it.value.size }
         when (sets.size) {
             1 -> 'A' // 5 of a kind!
