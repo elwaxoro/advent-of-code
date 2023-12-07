@@ -16,9 +16,7 @@ class Dec07 : PuzzleDayTester(7, 2023) {
     /**
      * 256448566
      */
-    override fun part1(): Any = cardReader().map { (hand, bid) ->
-        hand.alphabetize().scoreHand() to bid
-    }.gatherWinnings()
+    override fun part1(): Any = cardReader().map { (hand, bid) -> hand.alphabetize().scoreHand() to bid }.gatherWinnings()
 
     /**
      * 254412181
@@ -26,15 +24,12 @@ class Dec07 : PuzzleDayTester(7, 2023) {
      * If multiple sets have the same size, just pick one it doesn't matter which one, because tie-breaking only cares about the order of cards in the hand
      */
     override fun part2(): Any = cardReader().map { (hand, bid) ->
-        val converted = hand.alphabetize(jokerMode = true)
-        val rank = if (converted.contains('X')) {
-            // find the best group to swap the jokers into
-            converted.replace('X', converted.groupBy { it }.maxBy { set -> set.value.size.takeUnless { set.key == 'X' } ?: 0 }.key)
-        } else {
-            converted
-        }.scoreHand()[0]
-        "$rank$converted" to bid
+        hand.alphabetize(jokerMode = true).let { alphabetized ->
+            "${alphabetized.replaceJokers().scoreHand()[0]}$alphabetized" to bid
+        }
     }.gatherWinnings()
+
+    private fun String.replaceJokers(): String = replace('X', groupBy { it }.maxBy { set -> set.value.size.takeUnless { set.key == 'X' } ?: 0 }.key)
 
     private fun List<Pair<String, String>>.gatherWinnings() = sortedByDescending { it.first }.mapIndexed { index, (_, bid) -> (index + 1) * bid.toLong() }.sum()
 
