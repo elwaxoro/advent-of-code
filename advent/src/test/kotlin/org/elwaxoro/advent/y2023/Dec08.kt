@@ -15,14 +15,14 @@ class Dec08: PuzzleDayTester(8, 2023) {
      */
     override fun part1(): Any = loader().let { (directions, nodes) ->
         var key = "AAA"
-        var dirIdx = 0
+        var step = 0
         while (key != "ZZZ") {
             val node = nodes[key]!!
-            val direction = directions[dirIdx % directions.length]
+            val direction = directions[step % directions.length]
             key = node.first.takeIf { direction == 'L' } ?: node.second
-            dirIdx++
+            step++
         }
-        dirIdx
+        step
     }
 
     /**
@@ -34,19 +34,19 @@ class Dec08: PuzzleDayTester(8, 2023) {
     override fun part2(): Any = loader().let { (directions, nodes) ->
         var keys = nodes.filter { it.key.endsWith("A") }.keys.toList()
         val distances = mutableListOf<BigInteger>()
-        var dirIdx = 0
+        var step = 0
         while (keys.isNotEmpty()) {
             keys = keys.mapNotNull { key ->
                 if (key.endsWith("Z")) {
-                    distances.add(BigInteger.valueOf(dirIdx.toLong()))
+                    distances.add(BigInteger.valueOf(step.toLong()))
                     null
                 } else {
                     val node = nodes[key]!!
-                    val direction = directions[dirIdx % directions.length]
+                    val direction = directions[step % directions.length]
                     node.first.takeIf { direction == 'L' } ?: node.second
                 }
             }
-            dirIdx++
+            step++
         }
         distances.lcm()
     }
