@@ -32,23 +32,23 @@ class Dec08: PuzzleDayTester(8, 2023) {
      * Keep track of each key's loop size, then find the lowest common multiple for all of them
      */
     override fun part2(): Any = loader().let { (directions, nodes) ->
-        var keys = nodes.filter { it.key.endsWith("A") }.keys.map { it to it }
-        val distMap = mutableMapOf<String, BigInteger>()
+        var keys = nodes.filter { it.key.endsWith("A") }.keys.toList()
+        val distances = mutableListOf<BigInteger>()
         var dirIdx = 0
         while (keys.isNotEmpty()) {
-            keys = keys.mapNotNull { (start, current) ->
-                if (current.endsWith("Z")) {
-                    distMap[start] = BigInteger.valueOf(dirIdx.toLong())
+            keys = keys.mapNotNull { key ->
+                if (key.endsWith("Z")) {
+                    distances.add(BigInteger.valueOf(dirIdx.toLong()))
                     null
                 } else {
-                    val node = nodes[current]!!
+                    val node = nodes[key]!!
                     val direction = directions[dirIdx % directions.length]
-                    start to (node.first.takeIf { direction == 'L' } ?: node.second)
+                    node.first.takeIf { direction == 'L' } ?: node.second
                 }
             }
             dirIdx++
         }
-        distMap.values.lcm()
+        distances.lcm()
     }
 
     private fun loader() = load(delimiter = "\n\n").let { (d, n) ->
