@@ -5,6 +5,7 @@ import kotlin.math.abs
 
 /**
  * Cosmic Expansion
+ * in which I totally rewrote part 1 after reading part 2
  */
 class Dec11 : PuzzleDayTester(11, 2023) {
 
@@ -12,8 +13,9 @@ class Dec11 : PuzzleDayTester(11, 2023) {
 
     override fun part2(): Any = loader().expandTheGalaxies(1000000L).countTheDistances() == 644248339497L
 
-    private fun List<LCoord>.countTheDistances(): Long = mapIndexed { idx, coord -> drop(idx + 1).sumOf { coord.taxiDistance(it) } }.sum()
-
+    /**
+     * Offset each galaxy coordinate by the number of x and y expansions in play, multiplied by the expansion size
+     */
     private fun List<List<Char>>.expandTheGalaxies(multiplier: Long): List<LCoord> {
         val yExpansions = mapIndexedNotNull { index, chars -> index.takeIf { chars.none { it == '#' } } }
         val xExpansions = this[0].mapIndexedNotNull { index, _ -> index.takeIf { none { it[index] == '#' } } }
@@ -26,8 +28,13 @@ class Dec11 : PuzzleDayTester(11, 2023) {
         }
     }
 
+    private fun List<LCoord>.countTheDistances(): Long = mapIndexed { idx, coord -> drop(idx + 1).sumOf { coord.taxiDistance(it) } }.sum()
+
     private fun loader(): List<List<Char>> = load().map { it.toList() }
 
+    /**
+     * Need a Coord backed by Long instead of Int
+     */
     private data class LCoord(
         val x: Long,
         val y: Long
