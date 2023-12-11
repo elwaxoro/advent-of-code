@@ -20,7 +20,7 @@ class Dec11 : PuzzleDayTester(11, 2023) {
     override fun part2(): Any = loader().expandTheGalaxies(1000000L).countTheDistances()
 
     /**
-     * Offset each galaxy coordinate by the number of x and y expansions in play, multiplied by the expansion size
+     * Offset each galaxy coordinate by the number of x and y expansions in play
      */
     private fun List<List<Char>>.expandTheGalaxies(multiplier: Long): List<LCoord> {
         val yExpansions = mapIndexedNotNull { index, chars -> index.takeIf { chars.none { it == '#' } } }
