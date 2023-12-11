@@ -23,13 +23,15 @@ class Dec11 : PuzzleDayTester(11, 2023) {
      * Offset each galaxy coordinate by the number of x and y expansions in play
      */
     private fun List<List<Char>>.expandTheGalaxies(multiplier: Long): List<LCoord> {
-        val yExpansions = mapIndexedNotNull { index, chars -> index.takeIf { chars.none { it == '#' } } }
-        val xExpansions = this[0].mapIndexedNotNull { index, _ -> index.takeIf { none { it[index] == '#' } } }
+        val yExpansions = mapIndexedNotNull { y, row -> y.takeIf { row.none { it == '#' } } }
+        val xExpansions = first().mapIndexedNotNull { x, _ -> x.takeIf { none { it[x] == '#' } } }
         return flatMapIndexed { y, row ->
-            val yCount = yExpansions.count { it < y }
+            val yExpCt = yExpansions.count { it < y }
+            val yExpanded = y + yExpCt * multiplier - yExpCt
             row.mapIndexedNotNull { x, c ->
-                val xCount = xExpansions.count { it < x }
-                LCoord(x + xCount * multiplier - xCount, y + yCount * multiplier - yCount).takeIf { c == '#' }
+                val xExpCt = xExpansions.count { it < x }
+                val xExpanded = x + xExpCt * multiplier - xExpCt
+                LCoord(xExpanded, yExpanded).takeIf { c == '#' }
             }
         }
     }
