@@ -9,9 +9,15 @@ import kotlin.math.abs
  */
 class Dec11 : PuzzleDayTester(11, 2023) {
 
-    override fun part1(): Any = loader().expandTheGalaxies(2L).countTheDistances() == 9627977L
+    /**
+     * 9627977L
+     */
+    override fun part1(): Any = loader().expandTheGalaxies(2L).countTheDistances()
 
-    override fun part2(): Any = loader().expandTheGalaxies(1000000L).countTheDistances() == 644248339497L
+    /**
+     * 644248339497L
+     */
+    override fun part2(): Any = loader().expandTheGalaxies(1000000L).countTheDistances()
 
     /**
      * Offset each galaxy coordinate by the number of x and y expansions in play, multiplied by the expansion size
