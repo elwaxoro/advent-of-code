@@ -7,16 +7,6 @@ import org.elwaxoro.advent.PuzzleDayTester
  */
 class Dec12 : PuzzleDayTester(12, 2023) {
 
-    /**
-     * idea: first: check if record + checksum is impossible get next char in record.
-     * if ., drop it (recursive step)
-     * if ?, replace with both . and # (recursive step)
-     * if #, take next checksum item and convert things to # until item is satisfied (hitting a . before satisfied = broken attempt, give up)
-     * if next char after satisfied item is #, give up
-     * if next char after satisfied item is ? convert that to .
-     * if record is empty but checksum has items, give up
-     * if checksum is empty but record still has #, give up
-     */
     override fun part1(): Any = loader().sumOf { (record, checksum) -> recursiveSpringalator6001(record, checksum) } == 7344L
 
     override fun part2() = loader().sumOf { (record, checksum) -> recursiveSpringalator6001(record.repeatSeparator(5), checksum.repeat(5)) } == 1088006519007L
@@ -44,8 +34,8 @@ class Dec12 : PuzzleDayTester(12, 2023) {
         } else if (record.first() == '.') {
             recursiveSpringalator6001(record.drop(1), checksum) // recursive case: strip the . and go again
         } else if (record.first() == '?') {
-            recursiveSpringalator6001(record.drop(1), checksum) + // recursive case: same as replacing with a '.' that gets dropped next recursion
-                    (recursiveSpringalator6001('#' + record.drop(1), checksum).takeIf { checksum.isNotEmpty() } ?: 0L) // recursive case: attempt to start a set of springs, if any of the checksum is left
+            // recursive case: try the ? as # and .
+            listOf('.', '#').sumOf { recursiveSpringalator6001(it + record.drop(1), checksum) }
         } else if (record.first() == '#') {
             if (checksum.isEmpty()) {
                 0 // base case: invalid record: ran out of checksums but still have springs
