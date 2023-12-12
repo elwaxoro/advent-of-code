@@ -5,7 +5,7 @@ import org.elwaxoro.advent.PuzzleDayTester
 /**
  * Hot Springs
  */
-class Dec12: PuzzleDayTester(12, 2023) {
+class Dec12 : PuzzleDayTester(12, 2023) {
 
     /**
      * idea: first: check if record + checksum is impossible get next char in record.
@@ -17,33 +17,26 @@ class Dec12: PuzzleDayTester(12, 2023) {
      * if record is empty but checksum has items, give up
      * if checksum is empty but record still has #, give up
      */
-    override fun part1(): Any = loader().sumOf { (record, checksum) ->
-        recursiveSpringalator6001(record, checksum)
-    }
+    override fun part1(): Any = loader().sumOf { (record, checksum) -> recursiveSpringalator6001(record, checksum) } == 7344L
 
-    override fun part2() = loader().sumOf { (record, checksum) ->
-        recursiveSpringalator6001(record.repeatSeparator(5), checksum.repeat(5))
-    }
+    override fun part2() = loader().sumOf { (record, checksum) -> recursiveSpringalator6001(record.repeatSeparator(5), checksum.repeat(5)) } == 1088006519007L
 
-    private fun String.repeatSeparator(size: Int): String = (0 until size).map { this + "?" }.joinToString("").dropLast(1)
+    private fun String.repeatSeparator(size: Int): String = (0 until size).joinToString("") { "$this?" }.dropLast(1)
 
     private fun List<Int>.repeat(size: Int): List<Int> = (0 until size).flatMap { this }
 
     private val memo = mutableMapOf<String, Long>()
 
-    //selector: (line: List<Long>) -> Long
-    private fun computeIfAbsent(record: String, checksum: List<Int>, compute: (record: String, checksum: List<Int>) -> Long): Long {
-        val key = record + checksum.joinToString()
+    private fun computeIfAbsent(key: String, compute: () -> Long): Long =
         if (memo.containsKey(key)) {
-            return memo.getValue(key)
+            memo.getValue(key)
         } else {
-            val result = compute.invoke(record, checksum)
+            val result = compute.invoke()
             memo[key] = result
-            return result
+            result
         }
-    }
 
-    private fun recursiveSpringalator6001(record: String, checksum: List<Int>): Long = computeIfAbsent(record, checksum) { _, _ ->
+    private fun recursiveSpringalator6001(record: String, checksum: List<Int>): Long = computeIfAbsent(record + checksum.joinToString()) {
         if (record.isEmpty() && checksum.isEmpty()) {
             1 // base case: success! out of records and the checksum is empty
         } else if (record.isEmpty() && checksum.isNotEmpty()) {
@@ -53,7 +46,7 @@ class Dec12: PuzzleDayTester(12, 2023) {
         } else if (record.first() == '?') {
             recursiveSpringalator6001(record.drop(1), checksum) + // recursive case: same as replacing with a '.' that gets dropped next recursion
                     (recursiveSpringalator6001('#' + record.drop(1), checksum).takeIf { checksum.isNotEmpty() } ?: 0L) // recursive case: attempt to start a set of springs, if any of the checksum is left
-        } else if(record.first() == '#') {
+        } else if (record.first() == '#') {
             if (checksum.isEmpty()) {
                 0 // base case: invalid record: ran out of checksums but still have springs
             } else {
