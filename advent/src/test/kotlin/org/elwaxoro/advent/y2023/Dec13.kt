@@ -8,40 +8,63 @@ import org.elwaxoro.advent.rowColSwap
  */
 class Dec13: PuzzleDayTester(13, 2023) {
 
-    override fun part1(): Any = loader().map { pattern ->
-//        println("NEW PUZZLE")
-//        pattern.print()
-//        println("ROTATE")
-//        pattern.rowColSwap().print()
-        // ok what the fuck the mirror point has to touch three of the sides. fuuuuuuuck me
-        val horizontal = pattern.findMirrorPoint().filter { it.second + 1 == pattern.size || it.first == 0 }
-        val vertical = pattern.rowColSwap().findMirrorPoint().filter { it.second + 1 == pattern[0].size || it.first == 0 }
-//        println("Found ${horizontal.size} horizontal: $horizontal")
-//        println("Found ${vertical.size} vertical: $vertical")
-        println("Total found: ${horizontal.size + vertical.size}")
-        val maxH = horizontal.maxByOrNull { it.second-it.first } ?: (0 to 0)
-        val maxV = vertical.maxByOrNull { it.second-it.first } ?: (0 to 0)
-//        println("maxH: $maxH (h size: ${pattern.size}) maxV: $maxV (v size: ${pattern[0].size})")
-        val maxHMid = ((maxH.second+1-maxH.first)/2)+maxH.first
-        val maxVMid = ((maxV.second+1-maxV.first)/2)+maxV.first
-//        println("H mid: $maxHMid")
-//        println("V mid: $maxVMid")
-        if (maxHMid > maxVMid) {
-            maxHMid * 100
+    override fun part1(): Any = loader().sumOf { pattern ->
+        listOfNotNull(pattern.findHorizontalMirrorPoint()?.let { it * 100 }, pattern.rowColSwap().findHorizontalMirrorPoint()).single()
+    } == 30518
+
+    override fun part2(): Any = loader().sumOf { pattern ->
+//        println("---------------------------------")
+        val horizontal = pattern.findHorizontalMirrorPointList().toSet()
+        val vertical = pattern.rowColSwap().findHorizontalMirrorPointList().toSet()
+
+        val newHorizontal = doDumbShit(pattern).minus(horizontal)
+        val newVertical = doDumbShit(pattern.rowColSwap()).minus(vertical)
+//        println("old horizontal: $horizontal")
+//        println("new horizontal: $newHorizontal")
+//        println("old vertical: $vertical")
+//        println("new vertical: $newVertical")
+
+//        newHorizontal.minus(horizontal)
+
+        if (newHorizontal.isNotEmpty()) {
+            newHorizontal.single().let { (start, end) ->
+                (((end + 1 - start) / 2) + start) * 100
+            }
         } else {
-            maxVMid
+            newVertical.single().let { (start, end) ->
+                (((end + 1 - start) / 2) + start)
+            }
         }
-    }.sum() == 30518
+    } == 36735
+
+    private fun doDumbShit(pattern: List<List<Char>>): Set<Pair<Int, Int>> {
+//        println("starting size: ${pattern[0].size} x ${pattern.size}")
+//        pattern.print()
+        return pattern.indices.flatMap { rowIdx ->
+            pattern[0].indices.mapNotNull { colIdx ->
+                val swap = '.'.takeIf { pattern[rowIdx][colIdx] == '#' } ?: '#'
+                val rowsBefore = pattern.take(rowIdx)
+                val row = listOf(pattern[rowIdx].mapIndexed { index, c -> c.takeUnless { colIdx == index } ?: swap })
+                val rowsAfter = pattern.takeLast(pattern.size - 1 - rowIdx)
+                val newPattern = rowsBefore.plus(row).plus(rowsAfter)
+//                println("new: ${newPattern[0].size} x ${newPattern.size} iteration ${(rowIdx+1)*(colIdx+1)}")
+//                newPattern.print()
+
+                newPattern.findHorizontalMirrorPointList().takeIf { it.isNotEmpty() }//?.also { println("FOUND $it at iteration ${(rowIdx+1)*(colIdx+1)}") }
+            }.flatten()
+        }.toSet()
+//        println("All done!")
+//        println(all)
+//        return 0
+    }
 
     private fun List<List<Char>>.findHorizontalMirrorPoint(): Int? =
-        findMirrorPoint().singleOrNull { it.second + 1 == size || it.first == 0 }?.let { (start, end) ->
-            (((end+1-start)/2)+start)*100
+        findHorizontalMirrorPointList().singleOrNull()?.let { (start, end) ->
+            (((end+1-start)/2)+start)
         }
 
-    private fun List<List<Char>>.findVerticalMirrorPoint(): Int? =
-        rowColSwap().findMirrorPoint().singleOrNull { it.second + 1 == first().size || it.first == 0 }?.let { (start, end) ->
-            ((end+1-start)/2)+start
-        }
+    private fun List<List<Char>>.findHorizontalMirrorPointList(): List<Pair<Int, Int>> =
+        findMirrorPoint().filter { it.second + 1 == size || it.first == 0 }
 
     private fun List<List<Char>>.findMirrorPoint(): List<Pair<Int, Int>> = indices.mapNotNull { start ->
         val startCheck = drop(start)
@@ -61,8 +84,6 @@ class Dec13: PuzzleDayTester(13, 2023) {
             }
         }
     }.flatten()
-
-    override fun part2(): Any = "todo"
 
     private fun loader() = load(delimiter = "\n\n").map { it.split("\n").map { it.toList() } }
 
