@@ -9,6 +9,8 @@ import org.elwaxoro.advent.rowColSwap
 class Dec13 : PuzzleDayTester(13, 2023) {
 
     /**
+     * 30518
+     *
      * This got a LOT easier when you realize there's only ONE solution for every input
      * The reflection must touch 3/4 sides to be valid
      * There is either one horizontal or one vertical reflection
@@ -17,9 +19,11 @@ class Dec13 : PuzzleDayTester(13, 2023) {
     override fun part1(): Any = loader().sumOf { pattern ->
         pattern.findMirrorPoint().sumOf { it.midpoint() * 100 } +
                 pattern.rowColSwap().findMirrorPoint().sumOf { it.midpoint() }
-    } == 30518
+    }
 
     /**
+     * 36735
+     *
      * Same as part 1, except there can be more than one result
      * Vertical could have the original result, horizontal could have the new one ...
      * Use set functions to strip out duplicates and the original solution
@@ -32,7 +36,7 @@ class Dec13 : PuzzleDayTester(13, 2023) {
         val originalVertical = pattern.rowColSwap().findMirrorPoint().toSet()
         doDumbShit(pattern).minus(originalHorizontal).sumOf { it.midpoint() * 100 } +
                 doDumbShit(pattern.rowColSwap()).minus(originalVertical).sumOf { it.midpoint() }
-    } == 36735
+    }
 
     private fun Pair<Int, Int>.midpoint() = (((second + 1 - first) / 2) + first)
 
