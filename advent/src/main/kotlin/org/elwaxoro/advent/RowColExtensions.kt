@@ -10,7 +10,7 @@ package org.elwaxoro.advent
  * Rotate a matrix by swapping rows for columns
  */
 fun <T> List<List<T>>.rowColSwap(): MutableList<MutableList<T>> =
-    MutableList(size) { MutableList(size) { this[0][0] } }.also { translate ->
+    MutableList(this[0].size) { MutableList(size) { this[0][0] } }.also { translate ->
         forEachIndexed { rowIdx, row ->
             row.forEachIndexed { colIdx, value ->
                 translate[colIdx][rowIdx] = value
