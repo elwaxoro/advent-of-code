@@ -8,11 +8,17 @@ import org.elwaxoro.advent.Dir.*
  */
 class Dec14 : PuzzleDayTester(14, 2023) {
 
+    /**
+     * 109654
+     */
     override fun part1(): Any = loader().let { rocks ->
         val settledRound = rocks.tilt(N)
         settledRound.sumOf { it.y + 1 }
-    } == 109654
+    }
 
+    /**
+     * 94876
+     */
     override fun part2(): Any = loader().let { rocks ->
         val target = 1000000000
         val states = mutableMapOf<String, Int>()
@@ -25,7 +31,7 @@ class Dec14 : PuzzleDayTester(14, 2023) {
             }
             val key = settledRound.plus(rocks.second).printify()
             if (states.containsKey(key) && !foundSkip) {
-                // holy crap! found a loop! lets jump ahead as far as possible
+                // holy crap! found a loop! let's jump ahead as far as possible
                 val loopStart = states[key]!!
                 val loopSize = i - loopStart
                 // don't skip ahead so far that you go right off the end of the target
@@ -38,7 +44,7 @@ class Dec14 : PuzzleDayTester(14, 2023) {
             i++
         }
         settledRound.sumOf { it.y + 1 }
-    } == 94876
+    }
 
     private fun Pair<Set<Coord>, Set<Coord>>.tilt(dir: Dir): Set<Coord> {
         val bounds = first.plus(second).bounds()
