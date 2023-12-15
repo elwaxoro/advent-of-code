@@ -1,48 +1,59 @@
 package org.elwaxoro.advent.y2023
 
 import org.elwaxoro.advent.*
+import org.elwaxoro.advent.Dir.*
 
 /**
  * Parabolic Reflector Dish
  */
-class Dec14: PuzzleDayTester(14, 2023) {
+class Dec14 : PuzzleDayTester(14, 2023) {
 
-    override fun part1(): Any = loader().let { (round, flat) ->
-//        println(round.map { it.copyD('O') }.plus(flat).printify(invert = true))
-        val bounds = round.plus(flat).bounds()
-        val occupied = flat.toMutableSet()
-        val settledRound = mutableSetOf<Coord>()
-        val sortedRocks = round.sortedByDescending { it.y }
-        sortedRocks.map { rock ->
-            var rolyPoly = rock
-            var isStuck = false
-            while (!isStuck) {
-                val rolledTo = rolyPoly.move(Dir.N)
-                if (bounds.contains(rolledTo) && !occupied.contains(rolledTo)) {
-                    // round rock didn't roll off the map or run into any flat rocks
-                    rolyPoly = rolledTo
-                } else {
-                    isStuck = true
-                }
-            }
-//            println("Rolled $rock to $rolyPoly")
-            settledRound.add(rolyPoly.copyD('O'))
-            occupied.add(rolyPoly)
-        }
-        settledRound.plus(flat).printify(invert = true)
+    override fun part1(): Any = loader().let { rocks ->
+        val settledRound = rocks.tilt(N)
         settledRound.sumOf { it.y + 1 }
     } == 109654
 
-    private fun Pair<Set<Coord>, Set<Coord>>.tilt(dir: Dir): Pair<Set<Coord>, Set<Coord>> {
+    override fun part2(): Any = loader().let { rocks ->
+        val statemap = mutableMapOf<String, Int>()
+        var i = 1
+        var settledRound = rocks.first
+        var foundSkip = false
+        while(i <= 1000000000) {
+            settledRound = listOf(N, W, S, E).fold(settledRound) { acc, dir ->
+                (acc to rocks.second).tilt(dir)
+            }
+            val key = settledRound.plus(rocks.second).printify()
+            if (statemap.containsKey(key) && !foundSkip) {
+                val first = statemap[key]!!
+                val loopSize = i - first
+                val skip: Int = ((1000000000-first)/loopSize) - 1
+                i += (skip * loopSize)
+                foundSkip=true
+            } else {
+                statemap[key] = i
+            }
+            i ++
+        }
+        settledRound.sumOf { it.y + 1 }
+    } == 94876
+
+    private fun Pair<Set<Coord>, Set<Coord>>.tilt(dir: Dir): Set<Coord> {
         val bounds = first.plus(second).bounds()
         val occupied = second.toMutableSet()
         val settledRound = mutableSetOf<Coord>()
-        val sortedRocks = first.sortedByDescending { it.y }
+
+        val sortedRocks = when (dir) {
+            N -> first.sortedByDescending { it.y }
+            S -> first.sortedBy { it.y }
+            E -> first.sortedByDescending { it.x }
+            W -> first.sortedBy { it.x }
+        }
+
         sortedRocks.map { rock ->
             var rolyPoly = rock
             var isStuck = false
             while (!isStuck) {
-                val rolledTo = rolyPoly.move(Dir.N)
+                val rolledTo = rolyPoly.move(dir)
                 if (bounds.contains(rolledTo) && !occupied.contains(rolledTo)) {
                     // round rock didn't roll off the map or run into any flat rocks
                     rolyPoly = rolledTo
@@ -50,13 +61,11 @@ class Dec14: PuzzleDayTester(14, 2023) {
                     isStuck = true
                 }
             }
-            settledRound.add(rolyPoly.copyD('O'))
+            settledRound.add(rolyPoly)
             occupied.add(rolyPoly)
         }
-        return settledRound to second
+        return settledRound
     }
-
-    override fun part2(): Any = ""
 
     private fun loader() = load().reversed().flatMapIndexed { y, row ->
         row.mapIndexedNotNull { x, c ->
