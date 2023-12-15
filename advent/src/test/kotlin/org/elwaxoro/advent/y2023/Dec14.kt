@@ -14,25 +14,28 @@ class Dec14 : PuzzleDayTester(14, 2023) {
     } == 109654
 
     override fun part2(): Any = loader().let { rocks ->
-        val statemap = mutableMapOf<String, Int>()
+        val target = 1000000000
+        val states = mutableMapOf<String, Int>()
         var i = 1
         var settledRound = rocks.first
         var foundSkip = false
-        while(i <= 1000000000) {
+        while (i <= target) {
             settledRound = listOf(N, W, S, E).fold(settledRound) { acc, dir ->
                 (acc to rocks.second).tilt(dir)
             }
             val key = settledRound.plus(rocks.second).printify()
-            if (statemap.containsKey(key) && !foundSkip) {
-                val first = statemap[key]!!
-                val loopSize = i - first
-                val skip: Int = ((1000000000-first)/loopSize) - 1
+            if (states.containsKey(key) && !foundSkip) {
+                // holy crap! found a loop! lets jump ahead as far as possible
+                val loopStart = states[key]!!
+                val loopSize = i - loopStart
+                // don't skip ahead so far that you go right off the end of the target
+                val skip: Int = ((target - loopStart) / loopSize) - 1
                 i += (skip * loopSize)
-                foundSkip=true
+                foundSkip = true
             } else {
-                statemap[key] = i
+                states[key] = i
             }
-            i ++
+            i++
         }
         settledRound.sumOf { it.y + 1 }
     } == 94876
