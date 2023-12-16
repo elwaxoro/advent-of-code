@@ -3,67 +3,26 @@ package org.elwaxoro.advent.y2023
 import org.elwaxoro.advent.*
 import org.elwaxoro.advent.Dir.*
 
-class Dec16: PuzzleDayTester(16, 2023) {
-    override fun part1(): Any = loader().let { contraption ->
-        val bounds = contraption.flatten().bounds()
-        var beams = listOf(Beam(Coord(-1, bounds.second.y, '@'), E))
-        val energized = mutableMapOf<Coord, MutableList<Dir>>()
-        contraption.flatten().plus(beams.map { it.coord }).printify(invert = true)
-        // TODO beams go in infinite loop need a way to stop them
-        while(beams.isNotEmpty()) {
-//            println("BEAMS: ${beams.size}")
-//            println("ENERGIZED ${energized.size}")
-            beams = beams.flatMap { beam ->
-                val coord = beam.coord.move(beam.heading)
-                if (bounds.contains(coord)) {
-                    val tile = contraption[coord.y][coord.x]
-                    val state = energized[coord]
-                    if (state != null && state.contains(beam.heading)) {
-                        // this tile has already been energized by a beam of light with the same heading, throw the beam away
-                        listOf()
-                    } else {
-                        // this tile has not been energized from this direction yet
-                        val update = energized.getOrPut(coord) { mutableListOf() }
-                        update.add(beam.heading)
-                        when (tile.d) {
-                            '.' -> listOf(Beam(coord, beam.heading)) // no change, keep going
-                            '|' -> when(beam.heading) {
-                                N, S -> listOf(Beam(coord, beam.heading)) // no change, keep going
-                                E, W -> listOf(Beam(coord, N), Beam(coord, S)) // SPLIT!
-                            }
-                            '\\' -> when(beam.heading) { // TURN!
-                                N -> listOf(Beam(coord, W))
-                                S -> listOf(Beam(coord, E))
-                                E -> listOf(Beam(coord, S))
-                                W -> listOf(Beam(coord, N))
-                            }
-                            '-' -> when(beam.heading) {
-                                N, S -> listOf(Beam(coord, E), Beam(coord, W)) // SPLIT!
-                                E, W -> listOf(Beam(coord, beam.heading)) // no change, keep going
-                            }
-                            '/' -> when(beam.heading) { // TURN!
-                                N -> listOf(Beam(coord, E))
-                                S -> listOf(Beam(coord, W))
-                                E -> listOf(Beam(coord, N))
-                                W -> listOf(Beam(coord, S))
-                            }
-                            else -> throw IllegalStateException("what the hekcy, becky?")
-                        }
-                    }
-                } else {
-                    listOf() // beam flew off the contraption
-                }
-            }
-        }
-        energized.size
-    } == 7884
+/**
+ * The Floor Will Be Lava
+ */
+class Dec16 : PuzzleDayTester(16, 2023) {
 
     /**
-     * 2 beams on the same square in same direction can be combined (unless counting tile hits is the point)
-     *
+     * 7884
      */
-    override fun part2(): Any {
-        return super.part2()
+    override fun part1(): Any = loader().let { contraption ->
+        val bounds = contraption.flatten().bounds()
+        contraption.lightUpTheContraption(Beam(Coord(-1, bounds.second.y, '@'), E))
+    }
+
+    /**
+     * 8185
+     */
+    override fun part2(): Any = loader().let { contraption ->
+        val bounds = contraption.flatten().bounds()
+        (bounds.first.x..bounds.second.x).flatMap { listOf(Beam(Coord(it, bounds.first.y - 1), N), Beam(Coord(it, bounds.second.y + 1), S)) }.plus(
+            (bounds.first.y..bounds.second.y).flatMap { listOf(Beam(Coord(bounds.first.x - 1, it), E), Beam(Coord(bounds.second.x + 1, it), W)) }).maxOf { contraption.lightUpTheContraption(it) }
     }
 
     private fun List<List<Coord>>.lightUpTheContraption(startingBeam: Beam): Int {
@@ -71,7 +30,7 @@ class Dec16: PuzzleDayTester(16, 2023) {
         var beams = listOf(startingBeam)
         val energized = mutableMapOf<Coord, MutableList<Dir>>()
         // TODO beams go in infinite loop need a way to stop them
-        while(beams.isNotEmpty()) {
+        while (beams.isNotEmpty()) {
             beams = beams.flatMap { beam ->
                 val coord = beam.coord.move(beam.heading)
                 if (bounds.contains(coord)) {
@@ -86,26 +45,30 @@ class Dec16: PuzzleDayTester(16, 2023) {
                         update.add(beam.heading)
                         when (tile.d) {
                             '.' -> listOf(Beam(coord, beam.heading)) // no change, keep going
-                            '|' -> when(beam.heading) {
+                            '|' -> when (beam.heading) {
                                 N, S -> listOf(Beam(coord, beam.heading)) // no change, keep going
                                 E, W -> listOf(Beam(coord, N), Beam(coord, S)) // SPLIT!
                             }
-                            '\\' -> when(beam.heading) { // TURN!
+
+                            '\\' -> when (beam.heading) { // TURN!
                                 N -> listOf(Beam(coord, W))
                                 S -> listOf(Beam(coord, E))
                                 E -> listOf(Beam(coord, S))
                                 W -> listOf(Beam(coord, N))
                             }
-                            '-' -> when(beam.heading) {
+
+                            '-' -> when (beam.heading) {
                                 N, S -> listOf(Beam(coord, E), Beam(coord, W)) // SPLIT!
                                 E, W -> listOf(Beam(coord, beam.heading)) // no change, keep going
                             }
-                            '/' -> when(beam.heading) { // TURN!
+
+                            '/' -> when (beam.heading) { // TURN!
                                 N -> listOf(Beam(coord, E))
                                 S -> listOf(Beam(coord, W))
                                 E -> listOf(Beam(coord, N))
                                 W -> listOf(Beam(coord, S))
                             }
+
                             else -> throw IllegalStateException("what the hekcy, becky?")
                         }
                     }
@@ -117,7 +80,7 @@ class Dec16: PuzzleDayTester(16, 2023) {
         return energized.size
     }
 
-    private fun loader() = load().reversed().mapIndexed { y, s -> s.mapIndexed { x, c -> Coord(x,y,c) } }
+    private fun loader() = load().reversed().mapIndexed { y, s -> s.mapIndexed { x, c -> Coord(x, y, c) } }
 
     private data class EnergizedTile(
         val coord: Coord,
