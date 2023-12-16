@@ -20,16 +20,15 @@ class Dec16 : PuzzleDayTester(16, 2023) {
      * 8185
      */
     override fun part2(): Any = loader().let { contraption ->
-        val bounds = contraption.flatten().bounds()
-        (bounds.first.x..bounds.second.x).flatMap { listOf(Beam(Coord(it, bounds.first.y - 1), N), Beam(Coord(it, bounds.second.y + 1), S)) }.plus(
-            (bounds.first.y..bounds.second.y).flatMap { listOf(Beam(Coord(bounds.first.x - 1, it), E), Beam(Coord(bounds.second.x + 1, it), W)) }).maxOf { contraption.lightUpTheContraption(it) }
+        val yBeams = contraption.indices.flatMap { y -> listOf(Beam(Coord(0 - 1, y), E), Beam(Coord(contraption[0].size, y), W)) }
+        val xBeams = contraption[0].indices.flatMap { x -> listOf(Beam(Coord(x, 0 - 1), N), Beam(Coord(x, contraption.size), S)) }
+        yBeams.plus(xBeams).maxOf { contraption.lightUpTheContraption(it) }
     }
 
     private fun List<List<Coord>>.lightUpTheContraption(startingBeam: Beam): Int {
         val bounds = flatten().bounds()
         var beams = listOf(startingBeam)
         val energized = mutableMapOf<Coord, MutableList<Dir>>()
-        // TODO beams go in infinite loop need a way to stop them
         while (beams.isNotEmpty()) {
             beams = beams.flatMap { beam ->
                 val coord = beam.coord.move(beam.heading)
@@ -81,11 +80,6 @@ class Dec16 : PuzzleDayTester(16, 2023) {
     }
 
     private fun loader() = load().reversed().mapIndexed { y, s -> s.mapIndexed { x, c -> Coord(x, y, c) } }
-
-    private data class EnergizedTile(
-        val coord: Coord,
-        val entries: MutableList<Dir> = mutableListOf()
-    )
 
     private data class Beam(
         val coord: Coord,
