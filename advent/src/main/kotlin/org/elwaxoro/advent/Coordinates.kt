@@ -509,6 +509,11 @@ enum class Rotation4(val matrix: Matrix4) {
     }
 }
 
+operator fun <E> List<List<E>>.get(coord: Coord) = this[coord.y][coord.x]
+
+operator fun <E> Collection<Collection<E>>.contains(coord: Coord): Boolean =
+    this.isNotEmpty() && coord.y in this.indices && coord.x in this.first().indices
+
 data class LCoord(val x: Long, val y: Long) {
     fun taxiDistance(to: LCoord): Long = abs(to.x - x) + abs(to.y - y)
 
