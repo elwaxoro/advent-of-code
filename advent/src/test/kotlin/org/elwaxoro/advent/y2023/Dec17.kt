@@ -59,6 +59,7 @@ class Dec17 : PuzzleDayTester(17, 2023) {
 
         while (queue.isNotEmpty()) {
             val (coord, cost) = queue.remove()
+            // since all costs in the puzzle are positive, the first valid exit is the cheapest (via priority queue sorting)
             if (end(coord)) {
                 return cost
             }
