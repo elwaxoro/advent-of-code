@@ -508,3 +508,36 @@ enum class Rotation4(val matrix: Matrix4) {
             }.toSet()
     }
 }
+
+data class LCoord(val x: Long, val y: Long) {
+    fun taxiDistance(to: LCoord): Long = abs(to.x - x) + abs(to.y - y)
+
+    fun move(dir: Dir, distance: Long = 1): LCoord =
+        when (dir) {
+            Dir.N -> LCoord(x, y + distance)
+            Dir.S -> LCoord(x, y - distance)
+            Dir.E -> LCoord(x + distance, y)
+            Dir.W -> LCoord(x - distance, y)
+        }
+}
+
+/**
+ * Area of a simple polygon
+ * NOTE: coords must be in a positively oriented (counterclockwise) order to guarantee accuracy
+ * NOTE2: only used this for one puzzle and had to add + 2 to the output to get the right answer
+ * https://en.wikipedia.org/wiki/Shoelace_formula
+ */
+fun List<LCoord>.shoelaceArea(): Double {
+    val n = size
+    var a = 0.0
+    for (i in 0 until n - 1) {
+        a += this[i].x * this[i + 1].y - this[i + 1].x * this[i].y
+    }
+    return abs(a + this[n - 1].x * this[0].y -this[0].x * this[n - 1].y) / 2.0
+}
+
+/**
+ * Points on the interior + half the boundary -1 = total points
+ * https://en.wikipedia.org/wiki/Pick%27s_theorem
+ */
+fun picksTheorem(interior: Double, boundary: Double): Double = interior + (boundary / 2.0) - 1
