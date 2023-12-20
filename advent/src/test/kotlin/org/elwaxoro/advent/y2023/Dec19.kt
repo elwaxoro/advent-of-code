@@ -5,7 +5,7 @@ import org.elwaxoro.advent.PuzzleDayTester
 /**
  * Aplenty
  */
-class Dec19: PuzzleDayTester(19, 2023) {
+class Dec19 : PuzzleDayTester(19, 2023) {
 
     /**
      * 449531
@@ -20,7 +20,27 @@ class Dec19: PuzzleDayTester(19, 2023) {
             }
             part to history
         }.filter { it.second.last() == "A" }.sumOf { it.first.score() }
-    } == 449531L
+    }
+
+    private fun String.runWorkflow(part: Part): String {
+        val checks = split(",")
+        val applied = checks.first { check ->
+            val split = check.split(":")
+            if (split.size == 1) {
+                true
+            } else {
+                val comparison = split.first()
+                val amount = comparison.replace("[a-z<>]*".toRegex(), "").toInt()
+                val category = part.category(comparison[0])
+                if (comparison.contains("<")) {
+                    category < amount
+                } else {
+                    category > amount
+                }
+            }
+        }
+        return applied.split(":").last()
+    }
 
     /**
      * 122756210763577
@@ -57,7 +77,7 @@ class Dec19: PuzzleDayTester(19, 2023) {
                                 } else {
                                     // split the activeRange into two sets: one to explore, one to process additional workflow steps
                                     val passing = (xmas.first until limit)
-                                    val remainder = (limit .. xmas.last)
+                                    val remainder = (limit..xmas.last)
                                     explore.add(workflowDest to activeRange.replace(xmasKey, passing))
                                     activeRange.replace(xmasKey, remainder)
                                 }
@@ -75,8 +95,8 @@ class Dec19: PuzzleDayTester(19, 2023) {
                                     PartRange.blank()
                                 } else {
                                     // split the activeRange into two sets: one to explore, one to process additional workflow steps
-                                    val passing = (limit+1 .. xmas.last)
-                                    val remainder = (xmas.first .. limit)
+                                    val passing = (limit + 1..xmas.last)
+                                    val remainder = (xmas.first..limit)
                                     explore.add(workflowDest to activeRange.replace(xmasKey, passing))
                                     activeRange.replace(xmasKey, remainder)
                                 }
@@ -90,15 +110,23 @@ class Dec19: PuzzleDayTester(19, 2023) {
             }
         }
         accepted.sumOf { it.score() }
-    } == 122756210763577
+    }
 
-    data class PartRange(
-        val xmas: Map<String, IntRange> = mapOf(
-            "x" to  (1..4000),
-            "m" to (1..4000),
-            "a" to (1..4000),
-            "s" to (1..4000)
-        ).toMap()
+    private data class Part(val x: Int, val m: Int, val a: Int, val s: Int) {
+
+        fun category(check: Char): Int = when (check) {
+            'x' -> x
+            'm' -> m
+            'a' -> a
+            's' -> s
+            else -> throw IllegalStateException("PART ASPLODE")
+        }
+
+        fun score(): Long = (x + m + a + s).toLong()
+    }
+
+    private data class PartRange(
+        val xmas: Map<String, IntRange> = listOf("x", "m", "a", "s").associateWith { (1..4000) }
     ) {
         companion object {
             fun blank(): PartRange = PartRange(emptyMap())
@@ -109,49 +137,16 @@ class Dec19: PuzzleDayTester(19, 2023) {
         fun score(): Long = xmas.values.map { it.last - it.first + 1L }.reduce(Long::times)
     }
 
-    private fun String.runWorkflow(part: Part): String {
-        val checks = split(",")
-        val applied = checks.first { check ->
-            val split = check.split(":")
-            if (split.size == 1) {
-                true
-            } else {
-                val comparison = split.first()
-                val amount = comparison.replace("[a-z<>]*".toRegex(), "").toInt()
-                val category = part.category(comparison[0])
-                if (comparison.contains("<")) {
-                    category < amount
-                } else {
-                    category > amount
-                }
-            }
-        }
-        return applied.split(":").last()
-    }
-
     private fun loader() = load(delimiter = "\n\n").let { (w, p) ->
         val workflows = w.split("\n").map {
             val (key, workflow) = it.replace("}", "").split("{")
             key to workflow
         }
-        val parts =  p.split("\n").map { it.toPart() }
+        val parts = p.split("\n").map { it.toPart() }
         workflows.toMap() to parts
     }
 
     private fun String.toPart(): Part = replace("[{}=xmas]*".toRegex(), "").split(",").map { it.toInt() }.let { (x, m, a, s) ->
         Part(x, m, a, s)
     }
-}
-
-data class Part(val x: Int, val m: Int, val a: Int, val s: Int) {
-
-    fun category(check: Char): Int = when(check) {
-        'x' -> x
-        'm' -> m
-        'a' -> a
-        's' -> s
-        else -> throw IllegalStateException("PART ASPLODE")
-    }
-
-    fun score(): Long = (x + m + a + s).toLong()
 }
