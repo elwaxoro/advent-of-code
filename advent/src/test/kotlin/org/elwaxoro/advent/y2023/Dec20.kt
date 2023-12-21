@@ -8,6 +8,9 @@ import org.elwaxoro.advent.lcm
  */
 class Dec20 : PuzzleDayTester(20, 2023) {
 
+    /**
+     * 825167435L
+     */
     override fun part1(): Any = loader().let { map ->
         val button = map["button"]!!
         repeat(1000) {
@@ -20,8 +23,13 @@ class Dec20 : PuzzleDayTester(20, 2023) {
         val highs = map.map { it.value.highCounter }.sum()
         val lows = map.map { it.value.lowCounter }.sum()
         highs * lows
-    } == 825167435L
+    }
 
+    /**
+     * 225514321828633L
+     * Graph inspection shows rx only input is bn, bn (conjunction) has multiple inputs
+     * Count presses until we find how long each of THOSE inputs takes to emit a low pulse, then use LCM on that list to get the answer
+     */
     override fun part2(): Any = loader().let { map ->
         val button = map["button"]!!
         val targets = map["rx"]!!.inputs.values.single().inputs.values
@@ -42,7 +50,7 @@ class Dec20 : PuzzleDayTester(20, 2023) {
             pressCount++
         }
         found.map { it.value.toBigInteger() }.lcm().toLong()
-    } == 225514321828633L
+    }
 
     private fun loader() = load().map {
         val (description, outputs) = it.split(" -> ")
