@@ -75,7 +75,7 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
         /**
          * "x,y" string to coord
          */
-        fun parse(str: String) = str.replace("(","").replace(")","").split(",").let {
+        fun parse(str: String) = str.replace("(","").replace(")","").split(",").map { it.trim() }.let {
             Coord(it[0].toInt(), it[1].toInt())
         }
     }
@@ -340,7 +340,7 @@ data class Hex(val x: Int, val y: Int, val z: Int) {
  */
 data class Coord3D(val x: Int = 0, val y: Int = 0, val z: Int = 0, val w: Int = 1) {
     companion object {
-        fun parse(string: String): Coord3D = string.split(",").let { (a, b, c) ->
+        fun parse(string: String): Coord3D = string.split(",").map { it.trim() }.let { (a, b, c) ->
             Coord3D(a.toInt(), b.toInt(), c.toInt())
         }
     }
