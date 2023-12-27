@@ -20,6 +20,15 @@ enum class Dir {
                 'R' -> E
                 else -> throw UnsupportedOperationException("Can't turn $uplr from UDLR to NSWE!")
             }
+
+        fun fromCarets(caret: Char): Dir =
+            when (caret) {
+                '^' -> N
+                'v' -> S
+                '>' -> E
+                '<' -> W
+                else -> throw UnsupportedOperationException("Can't turn $caret from ^v>< to NSWE!")
+            }
     }
 
     /**
@@ -66,7 +75,7 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
         /**
          * "x,y" string to coord
          */
-        fun parse(str: String) = str.split(",").let {
+        fun parse(str: String) = str.replace("(","").replace(")","").split(",").let {
             Coord(it[0].toInt(), it[1].toInt())
         }
     }
