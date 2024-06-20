@@ -3,10 +3,6 @@
 # advent-of-code
 Just having some fun with https://adventofcode.com/ challenges, solved with Kotlin
 
-# 2023 Solutions
-Keeping these in a separate branch till the event is over, but if you wanna see them here they are:
-https://github.com/elwaxoro/advent-of-code/tree/2023/advent/src/test/kotlin/org/elwaxoro/advent/y2023
-
 ## How to has?
 
 Solve puzzles as unit tests, create each day in a file like `advent/src/test/kotlin/org/elwaxoro/advent/y2022/Dec01.kt`
