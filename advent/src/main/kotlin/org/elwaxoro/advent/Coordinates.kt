@@ -20,6 +20,15 @@ enum class Dir {
                 'R' -> E
                 else -> throw UnsupportedOperationException("Can't turn $uplr from UDLR to NSWE!")
             }
+
+        fun fromCarets(caret: Char): Dir =
+            when (caret) {
+                '^' -> N
+                'v' -> S
+                '>' -> E
+                '<' -> W
+                else -> throw UnsupportedOperationException("Can't turn $caret from ^v>< to NSWE!")
+            }
     }
 
     /**
@@ -66,7 +75,7 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
         /**
          * "x,y" string to coord
          */
-        fun parse(str: String) = str.split(",").let {
+        fun parse(str: String) = str.replace("(","").replace(")","").split(",").map { it.trim() }.let {
             Coord(it[0].toInt(), it[1].toInt())
         }
     }
@@ -102,12 +111,12 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
         Dir.entries.map { move(it) }
 
     /**
-     * Returns a 3x3 grid with all neighbor coords, including this coord at the center
+     * Returns a 3x3 grid with all neighbor coords, including this coord at the center if includeSelf is set
      */
-    fun neighbors9(): List<List<Coord>> =
+    fun neighbors9(includeSelf: Boolean = true): List<List<Coord>> =
         listOf(
             listOf(Coord(x - 1, y - 1), Coord(x, y - 1), Coord(x + 1, y - 1)),
-            listOf(Coord(x - 1, y), this, Coord(x + 1, y)),
+            listOfNotNull(Coord(x - 1, y), this.takeIf { includeSelf }, Coord(x + 1, y)),
             listOf(Coord(x - 1, y + 1), Coord(x, y + 1), Coord(x + 1, y + 1))
         )
 
@@ -331,7 +340,7 @@ data class Hex(val x: Int, val y: Int, val z: Int) {
  */
 data class Coord3D(val x: Int = 0, val y: Int = 0, val z: Int = 0, val w: Int = 1) {
     companion object {
-        fun parse(string: String): Coord3D = string.split(",").let { (a, b, c) ->
+        fun parse(string: String): Coord3D = string.split(",").map { it.trim() }.let { (a, b, c) ->
             Coord3D(a.toInt(), b.toInt(), c.toInt())
         }
     }
@@ -508,3 +517,41 @@ enum class Rotation4(val matrix: Matrix4) {
             }.toSet()
     }
 }
+
+operator fun <E> List<List<E>>.get(coord: Coord) = this[coord.y][coord.x]
+
+operator fun <E> Collection<Collection<E>>.contains(coord: Coord): Boolean =
+    this.isNotEmpty() && coord.y in this.indices && coord.x in this.first().indices
+
+data class LCoord(val x: Long, val y: Long) {
+    fun taxiDistance(to: LCoord): Long = abs(to.x - x) + abs(to.y - y)
+
+    fun move(dir: Dir, distance: Long = 1): LCoord =
+        when (dir) {
+            Dir.N -> LCoord(x, y + distance)
+            Dir.S -> LCoord(x, y - distance)
+            Dir.E -> LCoord(x + distance, y)
+            Dir.W -> LCoord(x - distance, y)
+        }
+}
+
+/**
+ * Area of a simple polygon
+ * NOTE: coords must be in a positively oriented (counterclockwise) order to guarantee accuracy
+ * NOTE2: only used this for one puzzle and had to add + 2 to the output to get the right answer
+ * https://en.wikipedia.org/wiki/Shoelace_formula
+ */
+fun List<LCoord>.shoelaceArea(): Double {
+    val n = size
+    var a = 0.0
+    for (i in 0 until n - 1) {
+        a += this[i].x * this[i + 1].y - this[i + 1].x * this[i].y
+    }
+    return abs(a + this[n - 1].x * this[0].y -this[0].x * this[n - 1].y) / 2.0
+}
+
+/**
+ * Points on the interior + half the boundary -1 = total points
+ * https://en.wikipedia.org/wiki/Pick%27s_theorem
+ */
+fun picksTheorem(interior: Double, boundary: Double): Double = interior + (boundary / 2.0) - 1

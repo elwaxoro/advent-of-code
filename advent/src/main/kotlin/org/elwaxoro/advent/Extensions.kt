@@ -93,4 +93,4 @@ fun List<BigInteger>.gcd(): BigInteger = fold(BigInteger.ZERO) { acc, int -> acc
 /**
  * least common multiple (LCM, LCD) for a list
  */
-fun List<BigInteger>.lcm(): BigInteger = fold(BigInteger.ONE) { acc, int -> acc * (int / int.gcd(acc)) }
+fun Collection<BigInteger>.lcm(): BigInteger = fold(BigInteger.ONE) { acc, int -> acc * (int / int.gcd(acc)) }
