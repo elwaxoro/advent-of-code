@@ -1,6 +1,8 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.9.20"
-    kotlin("plugin.serialization") version "1.9.20"
+    id("org.jetbrains.kotlin.jvm") version "2.0.21"
+    kotlin("plugin.serialization") version "2.0.21"
     application
 }
 
@@ -10,16 +12,13 @@ repositories {
 
 dependencies {
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
-    //implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    implementation("com.google.guava:guava:32.1.3-jre")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    implementation("com.google.guava:guava:33.2.1-jre")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
 }
 
 testing {
