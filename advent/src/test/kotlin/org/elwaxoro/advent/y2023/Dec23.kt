@@ -62,7 +62,9 @@ class Dec23: PuzzleDayTester(23, 2023) {
         val sorted = maze.flatten().groupBy { it.d }.map { group -> group.key to group.value.map { it.copyD() } }.toMap()
         val start = sorted['.']!!.maxBy { it.y }
         val end = sorted['.']!!.minBy { it.y }
-        dfs(start, end, 0, mutableSetOf(), maze)
+        // commented out for github runs
+//        dfs(start, end, 0, mutableSetOf(), maze)
+        "skipped!"
     }
 
     private fun dfs(current: Coord, end: Coord, distance: Int, visited: MutableSet<Coord>, maze: List<List<Coord>>): Int =
@@ -70,16 +72,16 @@ class Dec23: PuzzleDayTester(23, 2023) {
             0
         } else if (current == end) {
             // if hack is removed, un-comment this to get a result without having to wait the full time
-//            if (distance > maxPath) {
-//                println("found $distance")
-//                maxPath = distance
-//            }
+            if (distance > maxPath) {
+                println("found $distance")
+                maxPath = distance
+            }
             distance
         } else {
             // hack to shorten runtime on github, remove this to actually calculate
-            if (maxPath == 6322) {
-                maxPath
-            } else {
+//            if (maxPath == 6322) {
+//                maxPath
+//            } else {
                 // tried building sets during the search, but it's too much mem usage and blows up (like BFS did)
                 visited.add(current)
                 val max = current.neighbors().maxOf { neighbour ->
@@ -87,7 +89,7 @@ class Dec23: PuzzleDayTester(23, 2023) {
                 }
                 visited.remove(current)
                 max
-            }
+//            }
         }
 
     private fun loader() = load().reversed().mapIndexed { y, line ->

@@ -7,10 +7,9 @@ import org.elwaxoro.advent.PuzzleDayTester
  */
 class Dec25: PuzzleDayTester(25, 2023) {
 
-    override fun part1(): Any = loader().let { g ->
-        // TODO someday :'(
-        // it's been a fun AoC!
-    }
+    override fun part1(): Any = "TODO someday :("
+
+    override fun part2(): Any = "thanks for another fun year, AoC!"
 
     private fun loader() = load().map { it.replace(":", "").split(" ") }.fold(mutableMapOf<String, MutableList<String>>()) { map, split ->
         map.also {
