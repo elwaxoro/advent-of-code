@@ -27,7 +27,7 @@ class Dec04 : PuzzleDayTester(4, 2018) {
         maxSleeper.id * maxMinute.key
     }
 
-    data class Guard(
+    private data class Guard(
         val id: Int = -9999,
         val napMap: MutableMap<Int, Int> = mutableMapOf(),
         var isAsleep: Boolean = false,

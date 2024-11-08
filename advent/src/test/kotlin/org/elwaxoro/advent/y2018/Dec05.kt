@@ -20,7 +20,7 @@ class Dec05 : PuzzleDayTester(5, 2018) {
      * find the first letter matching its neighbor, but opposite case - remove both and back index up by 1
      * repeat until no more matches found
      */
-    tailrec fun reduce(input: String, idx: Int = 0): String =
+    private tailrec fun reduce(input: String, idx: Int = 0): String =
         if (idx == input.length - 1) {
             input
         } else {
