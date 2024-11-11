@@ -11,13 +11,11 @@ class Dec09 : PuzzleDayTester(9, 2018) {
     private fun playGame(playerCount: Int, lastScore: Int): Long {
         var marble = Marble().initFirst()
         val players = (1..playerCount).map { 0L }.toMutableList()
-        var player = -1
         (1..lastScore).forEach { count ->
-            player = (player + 1) % players.size
             if (count % 23 == 0) {
                 val remove = marble.rotate(-7)
                 marble = remove.pop()
-                players[player] += count + remove.score
+                players[count % players.size] += count + remove.score
             } else {
                 marble = marble.rotate(1).put(Marble(count.toLong()))
             }
