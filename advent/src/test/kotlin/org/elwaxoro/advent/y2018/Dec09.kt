@@ -2,6 +2,9 @@ package org.elwaxoro.advent.y2018
 
 import org.elwaxoro.advent.PuzzleDayTester
 
+/**
+ * Day 9: Marble Mania
+ */
 class Dec09 : PuzzleDayTester(9, 2018) {
 
     override fun part1(): Any = loader().let { (players, lastCount) -> playGame(players, lastCount) }

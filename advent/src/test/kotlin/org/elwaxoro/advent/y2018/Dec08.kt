@@ -2,6 +2,9 @@ package org.elwaxoro.advent.y2018
 
 import org.elwaxoro.advent.PuzzleDayTester
 
+/**
+ * Day 8: Memory Maneuver
+ */
 class Dec08 : PuzzleDayTester(8, 2018) {
 
     override fun part1(): Any = loader().metadataSum()
