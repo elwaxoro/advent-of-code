@@ -39,28 +39,33 @@ enum class Dir {
             N -> when (t) {
                 Turn.R -> E
                 Turn.L -> W
+                Turn.A -> N
             }
 
             S -> when (t) {
                 Turn.R -> W
                 Turn.L -> E
+                Turn.A -> S
             }
 
             E -> when (t) {
                 Turn.R -> S
                 Turn.L -> N
+                Turn.A -> E
             }
 
             W -> when (t) {
                 Turn.R -> N
                 Turn.L -> S
+                Turn.A -> W
             }
         }
 }
 
 enum class Turn {
     R,
-    L
+    L,
+    A // straight ahead
 }
 
 /**
