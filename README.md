@@ -1,7 +1,7 @@
 [![CI Build](https://github.com/elwaxoro/advent-of-code/actions/workflows/gradle.yml/badge.svg)](https://github.com/elwaxoro/advent-of-code/actions/workflows/gradle.yml)
 
 # advent-of-code
-Just having some fun with https://adventofcode.com/ challenges, solved with Kotlin
+Just having some fun solving [Advent of Code](https://adventofcode.com/) with [Kotlin](https://kotlinlang.org/)
 
 ## How to has?
 
