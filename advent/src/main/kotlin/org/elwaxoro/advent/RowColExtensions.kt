@@ -43,3 +43,14 @@ fun <T> List<List<T>>.neighbors(row: Int, col: Int): List<T> =
         getOrNull(row, col - 1),
         getOrNull(row, col + 1)
     )
+
+fun <T> MutableList<MutableList<T>>.rotateColumn(colIdx: Int, dist: Int) {
+    val col = this.rowColSwap()[colIdx].rotate(dist)
+    col.forEachIndexed { y, c ->
+        this[y][colIdx] = c
+    }
+}
+
+fun <T> List<T>.rotate(x: Int): List<T> = drop(size - x) + dropLast(x)
+
+fun <T> List<List<T>>.printify(): String = joinToString("\n") { it.joinToString("") }
