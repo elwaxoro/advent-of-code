@@ -45,6 +45,11 @@ fun <T> List<T>.padTo(newSize: Int): List<T> = takeIf { size >= newSize } ?: plu
 fun <T> List<T>.takeSplit(n: Int): Pair<List<T>, List<T>> = take(n) to drop(n)
 
 /**
+ * Makes a copy of a list missing the element at the given index
+ */
+fun <T> List<T>.dropAt(idx: Int): List<T> = toMutableList().also { it.removeAt(idx) }
+
+/**
  * Get the median from a list of Int
  */
 fun List<Int>.median(): Double = sorted().let {
