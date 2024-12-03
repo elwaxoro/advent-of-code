@@ -99,3 +99,9 @@ fun List<BigInteger>.gcd(): BigInteger = fold(BigInteger.ZERO) { acc, int -> acc
  * least common multiple (LCM, LCD) for a list
  */
 fun Collection<BigInteger>.lcm(): BigInteger = fold(BigInteger.ONE) { acc, int -> acc * (int / int.gcd(acc)) }
+
+/**
+ * Turns string into regex, finds all groups from input, extracts them and returns as a list
+ * I'm kind of uncertain why normal findAll makes this difficult
+ */
+fun String.findAllNonStupid(input: String): List<String> = toRegex().findAll(input).toList().map { it.groupValues[0] }
