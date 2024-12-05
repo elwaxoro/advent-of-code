@@ -49,6 +49,11 @@ fun <T> List<T>.takeSplit(n: Int): Pair<List<T>, List<T>> = take(n) to drop(n)
  */
 fun <T> List<T>.dropAt(idx: Int): List<T> = toMutableList().also { it.removeAt(idx) }
 
+fun <T> List<T>.swapAt(from: Int, to: Int): List<T> = toMutableList().also { ret ->
+    ret[to] = this[from]
+    ret[from] = this[to]
+}
+
 /**
  * Get the median from a list of Int
  */
