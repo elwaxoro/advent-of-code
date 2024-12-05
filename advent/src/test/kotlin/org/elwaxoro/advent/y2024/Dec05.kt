@@ -1,7 +1,6 @@
 package org.elwaxoro.advent.y2024
 
 import org.elwaxoro.advent.PuzzleDayTester
-import org.elwaxoro.advent.takeSplit
 
 /**
  * Day 5: Print Queue
@@ -33,12 +32,12 @@ class Dec05 : PuzzleDayTester(5, 2024) {
     }
 
     /**
-     * Returns the indexes of each invalid page in the update
+     * Returns list of bad pages in the update
      * If list is empty, update is good!
      */
-    private fun findBad(rules: List<List<String>>, update: List<String>): List<Int> = mutableListOf<String>().let { seen ->
-        update.mapIndexedNotNull { index, page ->
-            index.takeUnless { rules.none { it[1] == page } || rules.filter { it[1] == page }.all { seen.contains(it[0]) } }.also { seen.add(page) }
+    private fun findBad(rules: List<List<String>>, update: List<String>): List<String> = mutableListOf<String>().let { seen ->
+        update.mapNotNull { page ->
+            page.takeUnless { rules.none { it[1] == page } || rules.filter { it[1] == page }.all { seen.contains(it[0]) } }.also { seen.add(page) }
         }
     }
 
@@ -47,20 +46,15 @@ class Dec05 : PuzzleDayTester(5, 2024) {
      * Repeat until everything is placed correctly
      */
     private fun sortUpdate(rules: List<List<String>>, update: List<String>, workingPage: String? = null): List<String> {
-        val allBadIdx = findBad(rules, update)
-        if (allBadIdx.isEmpty()) {
+        val badPages = findBad(rules, update)
+        if (badPages.isEmpty()) {
             return update
         } else {
-            val badPages = allBadIdx.map { update[it] }
-            val nextIdx =
-                if (badPages.contains(workingPage)) {
-                    update.indexOf(workingPage)
-                } else {
-                    allBadIdx[0]
-                }
-            val (a, b) = update.takeSplit(nextIdx + 1)
-            val nextPage = a.takeLast(1).single()
-            val nextUpdate = a.dropLast(1) + b.take(1) + nextPage + b.drop(1)
+            val nextPage = workingPage?.takeIf { badPages.contains(it) } ?: badPages[0]
+            val nextIdx = update.indexOf(nextPage)
+            val nextUpdate = update.toMutableList()
+            nextUpdate[nextIdx + 1] = update[nextIdx]
+            nextUpdate[nextIdx] = update[nextIdx + 1]
             return sortUpdate(rules, nextUpdate, nextPage)
         }
     }
