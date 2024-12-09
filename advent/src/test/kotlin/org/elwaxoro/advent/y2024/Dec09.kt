@@ -35,7 +35,7 @@ class Dec09 : PuzzleDayTester(9, 2024) {
             if (chunk.isNotEmpty() && chunk[0] != -1) {
                 val dataIdx = defrag.indexOfFirst { it == chunk[0] }
                 val emptyIdx = defrag.findSpace(chunk.size, dataIdx)
-                if (emptyIdx > -1 && emptyIdx < dataIdx) {
+                if (emptyIdx > -1) {
                     (dataIdx..<dataIdx + chunk.size).forEach { defrag[it] = -1 }
                     (emptyIdx..<emptyIdx + chunk.size).forEach { defrag[it] = chunk[0] }
                 }
