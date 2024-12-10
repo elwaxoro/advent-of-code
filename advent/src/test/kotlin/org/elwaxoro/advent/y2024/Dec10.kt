@@ -8,7 +8,7 @@ import org.elwaxoro.advent.PuzzleDayTester
  */
 class Dec10 : PuzzleDayTester(10, 2024) {
 
-    override fun part1(): Any = loader().explore().sumOf { it.peaks.size }
+    override fun part1(): Any = loader().explore().sumOf { it.peaks().size }
 
     override fun part2(): Any = loader().explore().sumOf { it.paths.size }
 
@@ -26,8 +26,7 @@ class Dec10 : PuzzleDayTester(10, 2024) {
                     this[neighborCoord]?.let { neighborNode ->
                         // only go down
                         if (node.elevation - 1 == neighborNode.elevation) {
-                            // peaks and paths are stored in sets: brute force everything and let the sets manage uniqueness
-                            neighborNode.peaks.addAll(node.peaks)
+                            // brute force everything and let the set manage unique paths
                             neighborNode.paths.addAll(node.paths.map { it.plus(neighborCoord) })
                             seek.add(neighborNode)
                         }
@@ -43,13 +42,11 @@ class Dec10 : PuzzleDayTester(10, 2024) {
     private data class Node(
         val elevation: Int,
         val coord: Coord,
-        val peaks: MutableSet<Coord> = mutableSetOf(),
         val paths: MutableSet<List<Coord>> = mutableSetOf()
     ) {
         companion object {
             fun parse(x: Int, y: Int, c: Char) = Node(c.digitToInt(), Coord(x, y)).also {
                 if (it.isPeak()) {
-                    it.peaks.add(it.coord)
                     it.paths.add(listOf(it.coord))
                 }
             }
@@ -57,5 +54,6 @@ class Dec10 : PuzzleDayTester(10, 2024) {
 
         fun isPeak() = elevation == 9
         fun isTrailhead() = elevation == 0
+        fun peaks() = paths.map { it.first() }.distinct()
     }
 }
