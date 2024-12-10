@@ -17,20 +17,19 @@ class Dec10 : PuzzleDayTester(10, 2024) {
      * Returns list of trailheads
      */
     private fun Map<Coord, Node>.explore(): List<Node> {
-        val seek = filter { it.value.isPeak() }.map {
-            it.value.peaks.add(it.key)
-            it.value.paths.add(listOf(it.key))
-            it.key to it.value
-        }.toMutableList()
-
+        val seek = values.filter { it.isPeak() }.toMutableList()
         while (seek.isNotEmpty()) {
-            seek.removeFirst().takeIf { !it.second.isTrailhead() }?.let { (coord, node) ->
-                coord.neighbors().forEach { n ->
-                    this[n]?.let { nn ->
-                        if (nn.elevation + 1 == node.elevation) {
-                            nn.peaks.addAll(node.peaks)
-                            nn.paths.addAll(node.paths.map { it.plus(n) })
-                            seek.add(n to nn)
+            // skip trailheads, those paths are complete
+            seek.removeFirst().takeIf { !it.isTrailhead() }?.let { node ->
+                node.coord.neighbors().forEach { neighborCoord ->
+                    // ignore out-of-bounds neighbors
+                    this[neighborCoord]?.let { neighborNode ->
+                        // only go down
+                        if (node.elevation - 1 == neighborNode.elevation) {
+                            // peaks and paths are stored in sets: brute force everything and let the sets manage uniqueness
+                            neighborNode.peaks.addAll(node.peaks)
+                            neighborNode.paths.addAll(node.paths.map { it.plus(neighborCoord) })
+                            seek.add(neighborNode)
                         }
                     }
                 }
@@ -39,13 +38,23 @@ class Dec10 : PuzzleDayTester(10, 2024) {
         return values.filter { it.isTrailhead() }
     }
 
-    private fun loader() = load().mapIndexed { y, line -> line.mapIndexed { x, c -> Coord(x, y) to Node(c.digitToInt()) } }.flatten().toMap()
+    private fun loader() = load().mapIndexed { y, line -> line.mapIndexed { x, c -> Node.parse(x, y, c) } }.flatten().associateBy { it.coord }
 
     private data class Node(
         val elevation: Int,
+        val coord: Coord,
         val peaks: MutableSet<Coord> = mutableSetOf(),
         val paths: MutableSet<List<Coord>> = mutableSetOf()
     ) {
+        companion object {
+            fun parse(x: Int, y: Int, c: Char) = Node(c.digitToInt(), Coord(x, y)).also {
+                if (it.isPeak()) {
+                    it.peaks.add(it.coord)
+                    it.paths.add(listOf(it.coord))
+                }
+            }
+        }
+
         fun isPeak() = elevation == 9
         fun isTrailhead() = elevation == 0
     }
