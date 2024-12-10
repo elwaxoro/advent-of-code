@@ -110,3 +110,8 @@ fun Collection<BigInteger>.lcm(): BigInteger = fold(BigInteger.ONE) { acc, int -
  * I'm kind of uncertain why normal findAll makes this difficult
  */
 fun String.findAllNonStupid(input: String): List<String> = toRegex().findAll(input).toList().map { it.groupValues[0] }
+
+fun <K,V> Pair<K,V>.toEntry() = object: Map.Entry<K,V> {
+    override val key: K = first
+    override val value: V = second
+}
