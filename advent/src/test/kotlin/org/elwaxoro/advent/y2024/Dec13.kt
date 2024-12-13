@@ -40,7 +40,7 @@ import kotlin.math.roundToLong
  * pax - pay = bap * (bax - bay)
  * bap = (pax - pay) / (bax - bay)
  *
- * if bap and bay are "close enough" to whole numbers, the solve is good
+ * if bap and bay are both "close enough" to whole numbers, then solve is good
  * pap * 3 + bap is minimum tokens for each game
  */
 class Dec13 : PuzzleDayTester(13, 2024) {
@@ -55,7 +55,7 @@ class Dec13 : PuzzleDayTester(13, 2024) {
         val bay = b.y / a.y.toDouble()
         val bap = (pax - pay) / (bax - bay)
         val pap = pay - bap * bay
-        (pap.roundToLong() * 3 + bap.roundToLong()).takeIf { pap.isCloseToLong() && bap.isCloseToLong() } ?: 0
+        (pap.snap() * 3 + bap.snap()).takeIf { pap.slap() && bap.slap() } ?: 0
     }
 
     private fun loader() = load(delimiter = "\n\n").map { game ->
@@ -66,5 +66,8 @@ class Dec13 : PuzzleDayTester(13, 2024) {
      * "close enough" took me like 4 tries to walk in on part 2
      * started part 1 worked with 0.000001
      */
-    private fun Double.isCloseToLong(): Boolean = abs(this - this.roundToLong()) < 0.001
+    private fun Double.slap(): Boolean = abs(this - this.snap()) < 0.001
+
+    // I think I'm funny ok
+    private fun Double.snap(): Long = roundToLong()
 }
