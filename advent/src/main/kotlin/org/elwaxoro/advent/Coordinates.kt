@@ -216,6 +216,8 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
     fun equalsCoord(coord: Coord) = x == coord.x && y == coord.y
 }
 
+fun String.toCoord(): Coord = Coord.parse(this)
+
 /**
  * Contains check that ignores 'd' and just compares x,y values
  */

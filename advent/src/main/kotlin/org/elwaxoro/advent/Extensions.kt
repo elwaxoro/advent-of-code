@@ -113,6 +113,12 @@ fun String.findAllNonStupid(input: String): List<String> = toRegex().findAll(inp
 
 fun String.takeSplit(n: Int): List<String> = listOf(take(n), drop(n))
 
+/**
+ * A lot of puzzle parsing seems to require a chain of .replace("remove dumb thing", "")
+ * This does it all in one shot: "Puzzle input X=123, Y=456".remove("Puzzle input X=", " Y=") returns "123,456"
+ */
+fun String.remove(vararg str: String) = str.fold(this) { acc, rep -> acc.replace(rep, "") }
+
 fun <K,V> Pair<K,V>.toEntry() = object: Map.Entry<K,V> {
     override val key: K = first
     override val value: V = second
