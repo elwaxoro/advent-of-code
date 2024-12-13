@@ -18,11 +18,11 @@ import kotlin.math.roundToLong
  * p.x = (pap * a.x) + (bap * b.x)
  * p.y = (pap * a.y) + (bap * b.y)
  *
- * solve for pap
+ * solve for paps
  * p.x - (bap * b.x) = pap * a.x
- * (p.x - (bap * b.x) / a.x = pap
- * (p.x / a.x) - bap * (b.x / a.x) = pap
- * (p.y / a.y) - bap * (b.y / a.y) = pap
+ * pap = (p.x - (bap * b.x) / a.x
+ * pap = (p.x / a.x) - bap * (b.x / a.x)
+ * pap = (p.y / a.y) - bap * (b.y / a.y)
  *
  * extract a couple variables
  * pax = p.x / a.x
@@ -31,43 +31,40 @@ import kotlin.math.roundToLong
  * bay = b.y / a.y
  *
  * ahhh much nicer
- * pax - bap * bax = pap
- * pay - bap * bay = pap
+ * pap = pax - bap * bax
+ * pap = pay - bap * bay
  *
  * solve for bap
  * pax - bap * bax = pay - bap * bay
  * pax - pay = bap * bax - bap * bay
  * pax - pay = bap * (bax - bay)
- * (pax - pay) / (bax - bay) = bap
+ * bap = (pax - pay) / (bax - bay)
  *
  * if bap and bay are "close enough" to whole numbers, the solve is good
+ * pap * 3 + bap is minimum tokens for each game
  */
 class Dec13 : PuzzleDayTester(13, 2024) {
 
     override fun part1(): Any = loader().sumOf { it.solve() }
     override fun part2(): Any = loader().sumOf { it.solve(10000000000000) }
 
-    private fun List<Coord>.solve(boost: Long = 0L): Long {
-        val (a, b, p) = this
+    private fun List<Coord>.solve(boost: Long = 0L): Long = this.let { (a, b, p) ->
         val pax = (p.x + boost) / a.x.toDouble()
         val pay = (p.y + boost) / a.y.toDouble()
         val bax = b.x / a.x.toDouble()
         val bay = b.y / a.y.toDouble()
-        val paxy = pax - pay
-        val baxy = bax - bay
-        val bap = paxy / baxy
-        val pap = pay - (bap * bay)
-        return if (bap.isCloseToLong() && pap.isCloseToLong()) {
-            val tokens = pap.roundToLong() * 3 + bap.roundToLong()
-            tokens
-        } else {
-            0
-        }
+        val bap = (pax - pay) / (bax - bay)
+        val pap = pay - bap * bay
+        (pap.roundToLong() * 3 + bap.roundToLong()).takeIf { pap.isCloseToLong() && bap.isCloseToLong() } ?: 0
     }
 
     private fun loader() = load(delimiter = "\n\n").map { game ->
         game.split("\n").map { it.remove("Button A: X+", "Button B: X+", "Prize: X=", " Y+", " Y=").toCoord() }
     }
 
+    /**
+     * "close enough" took me like 4 tries to walk in on part 2
+     * started part 1 worked with 0.000001
+     */
     private fun Double.isCloseToLong(): Boolean = abs(this - this.roundToLong()) < 0.001
 }
