@@ -20,7 +20,7 @@ import kotlin.math.roundToLong
  *
  * solve for paps
  * p.x - (bap * b.x) = pap * a.x
- * pap = (p.x - (bap * b.x) / a.x
+ * pap = (p.x - (bap * b.x)) / a.x
  * pap = (p.x / a.x) - bap * (b.x / a.x)
  * pap = (p.y / a.y) - bap * (b.y / a.y)
  *
