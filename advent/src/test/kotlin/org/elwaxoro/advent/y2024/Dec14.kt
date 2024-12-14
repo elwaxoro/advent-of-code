@@ -29,7 +29,7 @@ class Dec14 : PuzzleDayTester(14, 2024) {
             robots.forEach { robot -> robot.move() }
             if (robots.count { it.p.x in 25..75 && it.p.y in 25..75 } > robots.size / 2) {
                 println("Iteration $i looks pretty good")
-                println(robots.map { it.p }.printify())
+                println(robots.map { it.p }.printify(empty = ' '))
                 return i
             }
         }
