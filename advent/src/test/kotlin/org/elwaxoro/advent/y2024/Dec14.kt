@@ -2,37 +2,42 @@ package org.elwaxoro.advent.y2024
 
 import org.elwaxoro.advent.*
 
-class Dec14: PuzzleDayTester(14, 2024) {
+private const val MAX_X = 100
+private const val MAX_Y = 102
+
+class Dec14 : PuzzleDayTester(14, 2024) {
 
     override fun part1(): Any = loader().let { robots ->
-        val bounds: Pair<Coord, Coord> = Pair(Coord(0, 0), Coord(100, 102))
-        (1..(101*103)).forEach {
+        (1..100).forEach { _ ->
             robots.forEach { robot -> robot.move() }
-            if (robots.count { it.p.x in 25..75 && it.p.y in 25..75 } > robots.size/2) {
-                println("Iteration $it looks pretty good")
-                println(bounds.toList().plus(robots.map { it.p }).printify())
-                return 0
-            }
         }
-
-        val midOut = robots.filter { it.p.x != bounds.second.x/2 && it.p.y != bounds.second.y/2 }
-        val vertSplit = midOut.partition { it.p.x < bounds.second.x/2 }.toList()
-        val horizSplit = vertSplit.flatMap { it.partition { it.p.y < bounds.second.y/2 }.toList() }
-        println(bounds.toList().plus(midOut.map { it.p.copyD('R') }).printify())
-        horizSplit.fold(1) { acc, split -> acc * split.size }
+        robots.count { it.p.x < MAX_X / 2 && it.p.y < MAX_Y / 2 } *
+                robots.count { it.p.x > MAX_X / 2 && it.p.y < MAX_Y / 2 } *
+                robots.count { it.p.x < MAX_X / 2 && it.p.y > MAX_Y / 2 } *
+                robots.count { it.p.x > MAX_X / 2 && it.p.y > MAX_Y / 2 }
     }
 
-    // 10403 too high
-    override fun part2(): Any {
-        return super.part2()
+    /**
+     * IDK what to even do with this.
+     * Idea: eventually a bunch of coords will get close enough together to make a picture
+     */
+    override fun part2(): Any = loader().let { robots ->
+        (1..20000).forEach { i ->
+            robots.forEach { robot -> robot.move() }
+            if (robots.count { it.p.x in 25..75 && it.p.y in 25..75 } > robots.size / 2) {
+                println("Iteration $i looks pretty good")
+                println(robots.map { it.p }.printify())
+                return i
+            }
+        }
+        return -1
     }
 
     private fun loader() = load().map { Robot.load(it.remove("p=", "v=").split(" ").map { it.toCoord() }) }
 
     private data class Robot(
         var p: Coord,
-        var v: Coord,
-        val bounds: Pair<Coord, Coord> = Pair(Coord(0, 0), Coord(100, 102))
+        var v: Coord
     ) {
         companion object {
             fun load(coords: List<Coord>): Robot = Robot(coords[0], coords[1])
@@ -40,22 +45,17 @@ class Dec14: PuzzleDayTester(14, 2024) {
 
         fun move() {
             p = p.add(v)
-            if (!bounds.contains(p)) {
-                // wrap around
-                var x = p.x
-                var y = p.y
-                if (p.x < 0) {
-                    x = bounds.second.x + p.x + 1
-                } else if (p.x > bounds.second.x) {
-                    x = p.x - bounds.second.x - 1
-                }
-                if (p.y < 0) {
-                    y = bounds.second.y + p.y + 1
-                } else if (p.y > bounds.second.y) {
-                    y = p.y - bounds.second.y - 1
-                }
-                p = Coord(x, y)
+            val x = when {
+                p.x < 0 -> MAX_X + p.x + 1
+                p.x > MAX_X -> p.x - MAX_X - 1
+                else -> p.x
             }
+            val y = when {
+                p.y < 0 -> MAX_Y + p.y + 1
+                p.y > MAX_Y -> p.y - MAX_Y - 1
+                else -> p.y
+            }
+            p = Coord(x, y)
         }
     }
 }
