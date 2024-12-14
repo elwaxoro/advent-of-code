@@ -5,6 +5,9 @@ import org.elwaxoro.advent.*
 private const val MAX_X = 100
 private const val MAX_Y = 102
 
+/**
+ * Day 14: Restroom Redoubt
+ */
 class Dec14 : PuzzleDayTester(14, 2024) {
 
     override fun part1(): Any = loader().let { robots ->
