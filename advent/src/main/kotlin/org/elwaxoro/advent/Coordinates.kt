@@ -223,6 +223,8 @@ fun String.toCoord(): Coord = Coord.parse(this)
  */
 fun Iterable<Coord>.containsCoord(coord: Coord) = any { it.x == coord.x && it.y == coord.y }
 
+fun Iterable<Coord>.copyD(c: Char) = map { it.copyD(c) }
+
 /**
  * Creates an in-order list of all coordinates visited by drawing a line from each Coord to the next
  * ex: [(0,0), (2,0), (5,5)] -> [(0,0), (1,0), (2,0), (3,1), (4,2), (5,3), (5,4), (5,5)]
