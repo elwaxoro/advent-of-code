@@ -60,6 +60,13 @@ enum class Dir {
                 Turn.A -> W
             }
         }
+
+    fun toChar(): Char = when (this) {
+        N -> 'N'
+        S -> 'S'
+        E -> 'E'
+        W -> 'W'
+    }
 }
 
 enum class Turn {
@@ -92,12 +99,12 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
 
     override fun toString(): String = "($x,$y)"
 
-    fun move(dir: Dir, distance: Int = 1): Coord =
+    fun move(dir: Dir, distance: Int = 1, md: Char? = null): Coord =
         when (dir) {
-            Dir.N -> Coord(x, y + distance, d)
-            Dir.S -> Coord(x, y - distance, d)
-            Dir.E -> Coord(x + distance, y, d)
-            Dir.W -> Coord(x - distance, y, d)
+            Dir.N -> Coord(x, y + distance, md ?: d)
+            Dir.S -> Coord(x, y - distance, md ?: d)
+            Dir.E -> Coord(x + distance, y, md ?: d)
+            Dir.W -> Coord(x - distance, y, md ?: d)
         }
 
     fun add(dx: Int, dy: Int): Coord =
