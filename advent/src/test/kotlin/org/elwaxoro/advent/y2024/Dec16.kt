@@ -4,7 +4,6 @@ import org.elwaxoro.advent.*
 
 /**
  * Day 16: Reindeer Maze
- * forward costs 1, turn costs 1000
  */
 class Dec16 : PuzzleDayTester(16, 2024) {
 
@@ -54,7 +53,6 @@ class Dec16 : PuzzleDayTester(16, 2024) {
         }
         val best = cost.keys.filter { it.copyD() == end }.minBy { cost[it]!! }
         return if (countVisited) {
-//            println(walls.plus(visited[best]!!.copyD('O')).toList().printify(empty = ' '))
             visited[best]!!.copyD().toSet().size
         } else {
             cost[best] ?: -1
