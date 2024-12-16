@@ -23,7 +23,7 @@ class Dec16 : PuzzleDayTester(16, 2024) {
                     e.turnMove(Turn.R) to c + 1000 + 1, // turn right forward 1
                     e.turnMove(Turn.L) to c + 1000 + 1, // turn left forward 1
                 ).filterNot { walls.contains(it.first.copyD()) }.map { (newEx, newCost) ->
-                    if (!cost.contains(newEx) || cost[newEx]!! >= newCost) {
+                    if (!cost.contains(newEx) || cost[newEx]!! > newCost) {
                         cost[newEx] = newCost
                         explore.add(newEx)
                     }
@@ -54,18 +54,12 @@ class Dec16 : PuzzleDayTester(16, 2024) {
         visited[start] = mutableSetOf(start.copyD())
         while (explore.isNotEmpty()) {
             val e = explore.removeFirst()
-            val d = e.copyD()
-            val dir = Dir.valueOf("${e.d}")
             val c = cost[e] ?: 0
-            if (d == end || walls.contains(d)) {
-                // welp this is useless, throw it away
-            } else {
-                // try to explore straight, turn right, turn left
-                // only explore if cost is missing or greater than this
+            if (e.copyD() != end) {
                 listOf(
-                    e.move(dir) to c + 1,
-                    e.move(dir.turn(Turn.R)).copyD(dir.turn(Turn.R).toString()[0]) to c + 1000 + 1,
-                    e.move(dir.turn(Turn.L)).copyD(dir.turn(Turn.L).toString()[0]) to c + 1000 + 1,
+                    e.move(e.toDir()) to c + 1, // explore forward 1
+                    e.turnMove(Turn.R) to c + 1000 + 1, // turn right forward 1
+                    e.turnMove(Turn.L) to c + 1000 + 1, // turn left forward 1
                 ).filterNot { walls.contains(it.first.copyD()) }.map { (newEx, newCost) ->
                     if (!cost.contains(newEx) || cost[newEx]!! > newCost) {
                         // replace
@@ -75,12 +69,15 @@ class Dec16 : PuzzleDayTester(16, 2024) {
                         set.addAll(visited[e]!!)
                         visited[newEx] = set
                     } else if (cost[newEx]!! == newCost) {
+                        // append
                         cost[newEx] = newCost
                         explore.add(newEx)
                         val set = visited.getOrDefault(newEx, mutableSetOf())
                         set.add(newEx.copyD())
                         set.addAll(visited[e]!!)
                         visited[newEx] = set
+                    } else {
+                        // worse path, discard
                     }
                 }
             }
