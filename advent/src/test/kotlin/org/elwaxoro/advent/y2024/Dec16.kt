@@ -54,6 +54,7 @@ class Dec16 : PuzzleDayTester(16, 2024) {
         }
         val best = cost.keys.filter { it.copyD() == end }.minBy { cost[it]!! }
         return if (countVisited) {
+//            println(walls.plus(visited[best]!!.copyD('O')).toList().printify(empty = ' '))
             visited[best]!!.copyD().toSet().size
         } else {
             cost[best] ?: -1
