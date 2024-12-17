@@ -1,6 +1,7 @@
 package org.elwaxoro.advent
 
 import java.math.BigInteger
+import kotlin.math.pow
 
 /**
  * Nullable Long plusser, null defaults to 0
@@ -119,7 +120,14 @@ fun String.takeSplit(n: Int): List<String> = listOf(take(n), drop(n))
  */
 fun String.remove(vararg str: String) = str.fold(this) { acc, rep -> acc.replace(rep, "") }
 
-fun <K,V> Pair<K,V>.toEntry() = object: Map.Entry<K,V> {
+fun <K, V> Pair<K, V>.toEntry() = object : Map.Entry<K, V> {
     override val key: K = first
     override val value: V = second
 }
+
+infix fun Long.pow(exponent: Int): Long = toDouble().pow(exponent).toLong()
+infix fun Long.pow(exponent: Long): Long = toDouble().pow(exponent.toDouble()).toLong()
+infix fun Int.pow(exponent: Int): Long = toDouble().pow(exponent).toLong()
+infix fun Int.pow(exponent: Long): Long = toDouble().pow(exponent.toDouble()).toLong()
+infix fun Long.xor(other: Int): Long = this xor other.toLong()
+
