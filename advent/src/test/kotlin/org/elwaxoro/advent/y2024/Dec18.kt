@@ -8,6 +8,7 @@ import kotlin.collections.set
 
 /**
  * Day 18: RAM Run
+ * Input observations: every byte is in-bounds of 0,0 thru 70,70 and there are no duplicates
  */
 class Dec18 : PuzzleDayTester(18, 2024) {
 
