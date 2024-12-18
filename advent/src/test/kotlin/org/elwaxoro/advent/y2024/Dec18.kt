@@ -16,6 +16,10 @@ class Dec18 : PuzzleDayTester(18, 2024) {
 
     override fun part1(): Any = explore(loader().take(1024))
 
+    /**
+     * First try: brute force from size 1025 up till first failure (25s runtime)
+     * Refactor: binary search (70 ms runtime)
+     */
     override fun part2(): Any = loader().let { it[binaryExplore(it)] }
 
     /**
