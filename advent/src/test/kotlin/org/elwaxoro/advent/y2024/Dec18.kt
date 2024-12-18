@@ -23,21 +23,6 @@ class Dec18 : PuzzleDayTester(18, 2024) {
      */
     override fun part2(): Any = loader().let { it[binaryExplore(it)!!] }
 
-    private fun binaryExplore(bytes: List<Coord>, low: Int = 0, high: Int = bytes.size): Int? =
-        if (low == high) {
-            low.takeIf { explore(bytes.take(low)) != MAX_VALUE }
-        } else {
-            val mid = low + (high - low) / 2
-            val score = explore(bytes.take(mid))
-            if (score != MAX_VALUE) {
-                // mid is valid, solution is mid or higher
-                binaryExplore(bytes, mid + 1, high) ?: mid
-            } else {
-                // mid is not valid, solution is lower
-                binaryExplore(bytes, low, mid - 1)
-            }
-        }
-
     /**
      * Basically a copy of Dec16 with extras torn out
      */
@@ -56,6 +41,19 @@ class Dec18 : PuzzleDayTester(18, 2024) {
         }
         return cost[bounds.second] ?: MAX_VALUE
     }
+
+    private fun binaryExplore(bytes: List<Coord>, low: Int = 0, high: Int = bytes.size): Int? =
+        if (low == high) {
+            low.takeIf { explore(bytes.take(low)) != MAX_VALUE }
+        } else {
+            val mid = low + (high - low) / 2
+            val score = explore(bytes.take(mid))
+            if (score != MAX_VALUE) {
+                binaryExplore(bytes, mid + 1, high) ?: mid
+            } else {
+                binaryExplore(bytes, low, mid - 1)
+            }
+        }
 
     private fun loader() = load().map { Coord.parse(it) }
 }
