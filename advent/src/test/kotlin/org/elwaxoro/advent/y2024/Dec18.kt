@@ -21,20 +21,19 @@ class Dec18 : PuzzleDayTester(18, 2024) {
      * First try: brute force from size 1025 up till first failure (25s runtime)
      * Refactor: binary search (70 ms runtime)
      */
-    override fun part2(): Any = loader().let { it[binaryExplore(it)] }
+    override fun part2(): Any = loader().let { it[binaryExplore(it)!!] }
 
-    /**
-     * Feels like this might fail if the target byte is ever "mid" but this did not happen with my input
-     */
-    private fun binaryExplore(bytes: List<Coord>, low: Int = 0, high: Int = bytes.size): Int =
+    private fun binaryExplore(bytes: List<Coord>, low: Int = 0, high: Int = bytes.size): Int? =
         if (low == high) {
-            low
+            low.takeIf { explore(bytes.take(low)) != MAX_VALUE }
         } else {
             val mid = low + (high - low) / 2
             val score = explore(bytes.take(mid))
-            if (score < MAX_VALUE) {
-                binaryExplore(bytes, mid + 1, high)
+            if (score != MAX_VALUE) {
+                // mid is valid, solution is mid or higher
+                binaryExplore(bytes, mid + 1, high) ?: mid
             } else {
+                // mid is not valid, solution is lower
                 binaryExplore(bytes, low, mid - 1)
             }
         }
