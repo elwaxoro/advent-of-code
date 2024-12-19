@@ -12,7 +12,7 @@ class Dec19: PuzzleDayTester(19, 2024) {
     override fun part2(): Any= loader().let { (towels, designs) -> designs.sumOf { arrangeTowels(it, towels) } }
 
     private fun arrangeTowels(design: String, towels: List<String>): Long = computeIfAbsent(design) {
-        (1L).takeIf { design.isEmpty() } ?: towels.filter { design.startsWith(it) }.sumOf { towel -> arrangeTowels(design.drop(towel.length), towels) }
+        (1L).takeIf { design.isEmpty() } ?: towels.filter { design.startsWith(it) }.sumOf { arrangeTowels(design.drop(it.length), towels) }
     }
 
     private fun loader() = load(delimiter = "\n\n").let { (towels, designs) -> towels.split(", ") to designs.split("\n") }
