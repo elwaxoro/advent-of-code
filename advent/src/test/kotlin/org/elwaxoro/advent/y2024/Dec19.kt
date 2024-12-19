@@ -19,12 +19,5 @@ class Dec19: PuzzleDayTester(19, 2024) {
 
     private val memo = mutableMapOf<String, Long>()
 
-    private fun computeIfAbsent(key: String, compute: () -> Long): Long =
-        if (memo.containsKey(key)) {
-            memo.getValue(key)
-        } else {
-            val result = compute.invoke()
-            memo[key] = result
-            result
-        }
+    private fun computeIfAbsent(key: String, compute: () -> Long): Long = memo.getOrPut(key) { compute.invoke() }
 }

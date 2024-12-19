@@ -46,18 +46,7 @@ class Dec12 : PuzzleDayTester(12, 2023) {
 
     private fun List<Int>.repeat(size: Int): List<Int> = (0 until size).flatMap { this }
 
-    // doesn't matter if the cache from part 1 is mixed with part 2
     private val memo = mutableMapOf<String, Long>()
 
-    /**
-     * HashMap was throwing ConcurrentModificationException so just make my own. with blackjack! and hookers!
-     */
-    private fun computeIfAbsent(key: String, compute: () -> Long): Long =
-        if (memo.containsKey(key)) {
-            memo.getValue(key)
-        } else {
-            val result = compute.invoke()
-            memo[key] = result
-            result
-        }
+    private fun computeIfAbsent(key: String, compute: () -> Long): Long = memo.getOrPut(key) { compute.invoke() }
 }
