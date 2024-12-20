@@ -13,11 +13,10 @@ class Dec20 : PuzzleDayTester(20, 2024) {
 
     private fun Map<Coord, Int>.countCheats(maxDist: Int): Int =
         map { (coord, cost) ->
-            coord.add(maxDist, maxDist)
-                .enumerateRectangle(coord.add(maxDist * -1, maxDist * -1))
+            coord.enumerateRectangle(maxDist)
                 .filter {
                     val dist = coord.taxiDistance(it)
-                    dist <= maxDist && (this[it] ?: 0) - cost - dist >= 100
+                    dist <= maxDist && getOrDefault(it, 0) - cost - dist >= 100
                 }.size
         }.sum()
 
@@ -36,9 +35,5 @@ class Dec20 : PuzzleDayTester(20, 2024) {
         return sortedPath
     }
 
-    private fun loader() = load().mapIndexed { y, line ->
-        line.mapIndexedNotNull { x, c ->
-            Coord(x, y, c).takeUnless { c == '#' }
-        }
-    }.flatten()
+    private fun loader() = load().flatMapIndexed { y, line -> line.mapIndexedNotNull { x, c -> Coord(x, y, c).takeUnless { c == '#' } } }
 }

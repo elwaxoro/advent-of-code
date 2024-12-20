@@ -180,6 +180,12 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
     }
 
     /**
+     * With this coord at the center, get all coords within a rectangle where x or y is dist away
+     * (corners will be x+dist, y+dist and x-dist, y-dist)
+     */
+    fun enumerateRectangle(dist: Int): List<Coord> = add(dist, dist).enumerateRectangle(add(dist * -1, dist * -1))
+
+    /**
      * Return the list of all coords in a line from this coord to the target coord, including both start and end coords
      * Coords are in order from this to toCoord
      * ex (0,0) to (5,-5) produces: [(0,0), (1,-1), (2,-2), (3,-3), (4,-4), (5,-5)]
