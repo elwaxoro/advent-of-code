@@ -11,19 +11,14 @@ class Dec20 : PuzzleDayTester(20, 2024) {
     override fun part1(): Any = loader().buildPath().countCheats(2)
     override fun part2(): Any = loader().buildPath().countCheats(20)
 
-    private fun Map<Coord, Int>.countCheats(maxDist: Int): Int =
-        map { (coord, cost) ->
-            coord.enumerateRectangle(maxDist)
-                .filter {
-                    val dist = coord.taxiDistance(it)
-                    dist <= maxDist && getOrDefault(it, 0) - cost - dist >= 100
-                }.size
-        }.sum()
+    private fun Map<Coord, Int>.countCheats(maxDist: Int): Int = map { (coord, cost) ->
+        coord.enumerateRectangle(maxDist).filter {
+            val dist = coord.taxiDistance(it)
+            dist <= maxDist && getOrDefault(it, 0) - cost - dist >= 100
+        }.size
+    }.sum()
 
-    private fun List<Coord>.buildPath(): Map<Coord, Int> {
-        val start = single { it.d == 'S' }.copyD()
-        val end = single { it.d == 'E' }.copyD()
-        val path = map { it.copyD() }.toSet()
+    private fun Triple<Coord, Coord, Set<Coord>>.buildPath(): Map<Coord, Int> = let { (start, end, path) ->
         var cost = 0
         var coord = start
         val sortedPath = mutableMapOf(start to 0)
@@ -35,5 +30,19 @@ class Dec20 : PuzzleDayTester(20, 2024) {
         return sortedPath
     }
 
-    private fun loader() = load().flatMapIndexed { y, line -> line.mapIndexedNotNull { x, c -> Coord(x, y, c).takeUnless { c == '#' } } }
+    private fun loader() = load().let { lines ->
+        var start = Coord()
+        var end = Coord()
+        val track = lines.flatMapIndexed { y, line ->
+            line.mapIndexedNotNull { x, c ->
+                when (c) {
+                    'S' -> Coord(x, y).also { start = it }
+                    'E' -> Coord(x, y).also { end = it }
+                    '.' -> Coord(x, y)
+                    else -> null
+                }
+            }
+        }.toSet()
+        Triple(start, end, track)
+    }
 }
