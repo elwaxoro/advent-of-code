@@ -5,26 +5,21 @@ import org.elwaxoro.advent.PuzzleDayTester
 /**
  * Day 23: LAN Party
  */
-class Dec23: PuzzleDayTester(23, 2024) {
+class Dec23 : PuzzleDayTester(23, 2024) {
 
     /**
      * 3-cliques with a "t" node in them
      */
-    override fun part1(): Any = loadNetwork().let { network ->
-        network.keys.filter { it.startsWith('t') }.flatMap { t ->
-            val connections = network.getValue(t)
-            connections.flatMap { c ->
-                network.getValue(c).filter { connections.contains(it) }.map { setOf(t, c, it) }
-            }
-        }.distinct().size
+    override fun part1(): Any = loader().let { (cliques, network) ->
+        growCliques(cliques.filter { it.any { it.startsWith('t') } }, network).size
     }
 
     /**
      * oh look it's maximum clique
+     * BRUTE FOOOOORCE GO!
      */
     override fun part2(): Any = loader().let { (initialCliques, network) ->
         var cliques = initialCliques
-        // BRUTE FOOOOORCE GO!
         while (true) {
             val newCliques = growCliques(cliques, network)
             if (newCliques.isNotEmpty()) {
@@ -35,14 +30,21 @@ class Dec23: PuzzleDayTester(23, 2024) {
         }
     }
 
+    /**
+     * for each node of a clique, see if we can add one connection to the clique
+     */
     private fun growCliques(cliques: List<Set<String>>, network: Map<String, Set<String>>): List<Set<String>> =
         cliques.flatMap { clique ->
-            // for each member of the clique, see if we can add something from their connections to the clique
-            clique.flatMap { member ->
-                network.getValue(member).filter { network.getValue(it).containsAll(clique) }.map { clique + it }
+            clique.flatMap { node ->
+                network.getValue(node).filter { network.getValue(it).containsAll(clique) }.map { clique + it }
             }.distinct()
         }.distinct()
 
+    /**
+     * load the input 2 ways:
+     * each connection becomes a 2-clique set
+     * each node gets a list of all connected nodes
+     */
     private fun loader() = load().let { input ->
         val cliques = input.map { it.split("-").toSet() }.distinct()
         val network = input.flatMap {
@@ -51,11 +53,4 @@ class Dec23: PuzzleDayTester(23, 2024) {
         }.groupBy { it.first }.mapValues { it.value.map { it.second }.toSet() }
         cliques to network
     }
-
-    private fun loadCliques() = load().map { it.split("-").toSet() }.distinct()
-
-    private fun loadNetwork() = load().flatMap {
-        val (a, b) = it.split("-")
-        listOf(a to b, b to a)
-    }.groupBy { it.first }.mapValues { it.value.map { it.second }.toSet() }
 }
