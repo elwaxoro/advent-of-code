@@ -33,13 +33,12 @@ class Dec22 : PuzzleDayTester(22, 2024) {
     }.groupBy { it.first }.map { it.value.sumOf { it.second } }.max()
 
     private fun String.generateSecrets(count: Int = 2000): List<Long> = secretGenerator().take(count + 1).toList()
-    private fun String.secretGenerator() = generateSequence(this.toLong()) { it.nextSecret() }
 
-    private fun Long.nextSecret(): Long {
-        var nextSecret = this.mix(this * 64).prune()
+    private fun String.secretGenerator() = generateSequence(this.toLong()) {
+        var nextSecret = it.mix(it * 64).prune()
         nextSecret = nextSecret.mix(nextSecret / 32).prune()
         nextSecret = nextSecret.mix(nextSecret * 2048).prune()
-        return nextSecret
+        nextSecret
     }
 
     private fun Long.mix(that: Long): Long = this xor that
