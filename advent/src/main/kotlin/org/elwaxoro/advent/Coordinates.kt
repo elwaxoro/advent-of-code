@@ -67,6 +67,13 @@ enum class Dir {
         E -> 'E'
         W -> 'W'
     }
+
+    fun toCaret(): Char = when (this) {
+        N -> '^'
+        S -> 'v'
+        E -> '>'
+        W -> '<'
+    }
 }
 
 enum class Turn {
