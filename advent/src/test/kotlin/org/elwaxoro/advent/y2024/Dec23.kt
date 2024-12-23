@@ -22,9 +22,9 @@ class Dec23: PuzzleDayTester(23, 2024) {
     /**
      * oh look it's maximum clique
      */
-    override fun part2(): Any {
-        val network = loadNetwork()
-        var cliques = loadCliques()
+    override fun part2(): Any = loader().let { (initialCliques, network) ->
+        var cliques = initialCliques
+        // BRUTE FOOOOORCE GO!
         while (true) {
             val newCliques = growCliques(cliques, network)
             if (newCliques.isNotEmpty()) {
