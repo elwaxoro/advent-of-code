@@ -34,11 +34,8 @@ class Dec22 : PuzzleDayTester(22, 2024) {
 
     private fun String.generateSecrets(count: Int = 2000): List<Long> = secretGenerator().take(count + 1).toList()
 
-    private fun String.secretGenerator() = generateSequence(this.toLong()) {
-        var nextSecret = it.mix(it * 64).prune()
-        nextSecret = nextSecret.mix(nextSecret / 32).prune()
-        nextSecret = nextSecret.mix(nextSecret * 2048).prune()
-        nextSecret
+    private fun String.secretGenerator() = generateSequence(this.toLong()) { seed ->
+        listOf<(input: Long) -> Long>({ it * 64 }, { it / 32 }, { it * 2048 }).fold(seed) { secret, f -> secret.mix(f.invoke(secret)).prune() }
     }
 
     private fun Long.mix(that: Long): Long = this xor that
