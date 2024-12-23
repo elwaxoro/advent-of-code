@@ -11,7 +11,6 @@ import org.elwaxoro.advent.cartesianProduct
  * don't move to the blank space! it freaks the robots out
  * every path for every robot starts and ends at A (so they can poke the pad in front of them)
  * when it's time to press a button on the door keypad, all other robots must be at the A position (and at the final press for a code, ALL robots are at A)
- * there's probably only 2 optimal paths between any 2 buttons? (>>^ and ^>> probably always better than >^> except base robot)
  */
 class Dec21 : PuzzleDayTester(21, 2024) {
 
@@ -46,7 +45,7 @@ class Dec21 : PuzzleDayTester(21, 2024) {
         Coord(0, 0) to '<', Coord(1, 0) to 'v', Coord(2, 0) to '>'
     )
 
-    // pre-compute the movement paths for each keypad
+    // movement paths for each keypad
     private val doorPaths = door.mapKeypad()
     private val controlPaths = controls.mapKeypad()
 
