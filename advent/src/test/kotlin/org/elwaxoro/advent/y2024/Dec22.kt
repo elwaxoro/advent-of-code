@@ -32,7 +32,8 @@ class Dec22 : PuzzleDayTester(22, 2024) {
         }.distinctBy { it.first }
     }.groupBy { it.first }.map { it.value.sumOf { it.second } }.max()
 
-    private fun String.generateSecrets(): List<Long> = (1..2000).fold(mutableListOf(this.toLong())) { acc, _ -> acc.also { it.add(it.last().nextSecret()) } }
+    private fun String.generateSecrets(count: Int = 2000): List<Long> = secretGenerator().take(count + 1).toList()
+    private fun String.secretGenerator() = generateSequence(this.toLong()) { it.nextSecret() }
 
     private fun Long.nextSecret(): Long {
         var nextSecret = this.mix(this * 64).prune()
