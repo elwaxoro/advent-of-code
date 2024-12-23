@@ -16,7 +16,7 @@ class Dec22 : PuzzleDayTester(22, 2024) {
      * Super lazy idea.
      * For each seed:
      * 1. generate all 2000 secrets and trim to last digit
-     * 2. generate all trim diffs and zip with trims
+     * 2. generate all trim diffs and zip with trims (first diff is just first trim)
      * 3. use a windowed view to make key / value pairs of 4 diffs to the last value
      * 4. only keep the first time a 4 diff view happens for each seed
      * 5. group everything by 4-diff key, merge the trim values into one number
