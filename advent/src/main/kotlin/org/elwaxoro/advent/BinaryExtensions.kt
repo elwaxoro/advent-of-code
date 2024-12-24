@@ -21,6 +21,7 @@ fun ByteArray.toHexString() = joinToString("") { (0xFF and it.toInt()).toString(
  * Takes a list of 1s and 0s and turns it into a single integer
  */
 fun List<Int>.toBinaryInt(): Int = joinToString("").toInt(2)
+fun List<Int>.toBinaryLong(): Long = joinToString("").toLong(2)
 
 /**
  * 0s become 1s, 1s become 0s
