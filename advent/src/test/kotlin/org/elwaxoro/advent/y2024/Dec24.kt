@@ -8,14 +8,49 @@ import org.elwaxoro.advent.toBinaryLong
  */
 class Dec24 : PuzzleDayTester(24, 2024) {
 
-    override fun part1(): Any = loader().let { (wires, connections) ->
+    override fun part1(): Any = loader().let { (wires, operations) ->
         while (wires.any { it.key.startsWith("z") && it.value == null }) {
-            pulse(wires, connections)
+            pulse(wires, operations)
         }
         wires.filter { it.key.startsWith("z") }.toSortedMap().values.mapNotNull { it }.reversed().toBinaryLong()
     }
 
-    private fun pulse(wires: MutableMap<String, Int?>, connections: List<Op>) = connections.forEach { op -> wires[op.out] = op.runOp(wires[op.a], wires[op.b]) }
+    /**
+     * this is a ripple carry adder. ugh.
+     * https://en.wikipedia.org/wiki/Adder_(electronics)
+     * on the plus side, we don't actually need to FIX anything here! just find bad gates
+     * input numbers are x00-x44 and y00-y44 output number is z00-z45
+     * each pair (bit) of xNN-yNN MUST eventually output to the same zNN
+     * each pair (bit) has 2 outputs (except the most-significant bit): XOR into Z, AND into some unknown cNN (carry bit to next-significant bit)
+     * each pair (bit) MUST be fed by the previous carry bit except the first one
+     */
+    override fun part2(): Any = loader().let { (wires, operations) ->
+        val lowOrderZ = "z45"
+        val highOrderX = "x00"
+
+        val bad = operations.filter { op ->
+            if (op.out.isZ() && op.op != "XOR" && op.out != lowOrderZ) {
+                // every output to zNN must be a XOR (except z45)
+                true
+            } else if (op.op == "XOR" && !op.out.isXYZ() && !op.a.isXYZ() && !op.b.isXYZ()) {
+                // every XOR must have at least one x,y input or a z output
+                true
+            } else if (op.op == "AND" && op.a != highOrderX && op.b != highOrderX) {
+                operations.any { sop -> sop.op != "OR" && (op.out == sop.a || op.out == sop.b) }
+            } else if (op.op == "XOR") {
+                operations.any { sop -> sop.op == "OR" && (op.out == sop.a || op.out == sop.b) }
+            } else {
+                false
+            }
+        }
+        bad.sortedBy { it.out }.joinToString(",") { it.out }
+    }
+
+    private val xyz = listOf('x', 'y', 'z')
+    private fun String.isZ() = startsWith('z')
+    private fun String.isXYZ() = xyz.contains(first())
+
+    private fun pulse(wires: MutableMap<String, Int?>, operations: List<Op>) = operations.forEach { op -> wires[op.out] = op.runOp(wires[op.a], wires[op.b]) }
 
     private fun loader() = load(delimiter = "\n\n").let { (rawWires, rawOps) ->
         val wires: MutableMap<String, Int?> = rawWires.split("\n").associate {
