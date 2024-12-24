@@ -5,7 +5,6 @@ import org.elwaxoro.advent.toBinaryLong
 
 /**
  * Day 24: Crossed Wires
- * with some help from the subreddit on part 2!
  */
 class Dec24 : PuzzleDayTester(24, 2024) {
 
