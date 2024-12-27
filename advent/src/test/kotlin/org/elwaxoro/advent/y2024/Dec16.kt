@@ -10,7 +10,7 @@ class Dec16 : PuzzleDayTester(16, 2024) {
     override fun part1(): Any = loader().explore(countVisited = false)
     override fun part2(): Any = loader().explore(countVisited = true)
 
-    private fun List<Coord>.explore(countVisited: Boolean): Int {
+    private fun Set<Coord>.explore(countVisited: Boolean): Int {
         val walls = filter { it.d == '#' }.copyD().toSet()
         val start = single { it.d == 'S' }.copyD('E') // tricky tricky, S/E on board != moving in those directions
         val end = single { it.d == 'E' }.copyD()
@@ -59,14 +59,7 @@ class Dec16 : PuzzleDayTester(16, 2024) {
         }
     }
 
-    private fun loader() = load().let { lines ->
-        lines.flatMapIndexed { y, line ->
-            line.mapIndexedNotNull { x, c ->
-                Coord(x, y, c).takeIf { c in listOf('#', 'S', 'E') }
-            }
-        }
-    }
-
+    private fun loader() = load().parseCoords(filter = setOf('.'))
     private fun Coord.toDir() = Dir.valueOf("$d")
     private fun Coord.turnMove(turn: Turn) = toDir().turn(turn).let { dir -> move(dir, md = dir.toChar()) }
 }

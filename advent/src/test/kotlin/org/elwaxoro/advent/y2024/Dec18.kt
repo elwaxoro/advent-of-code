@@ -3,6 +3,7 @@ package org.elwaxoro.advent.y2024
 import org.elwaxoro.advent.Coord
 import org.elwaxoro.advent.PuzzleDayTester
 import org.elwaxoro.advent.contains
+import org.elwaxoro.advent.toCoord
 import kotlin.Int.Companion.MAX_VALUE
 import kotlin.collections.set
 
@@ -55,5 +56,5 @@ class Dec18 : PuzzleDayTester(18, 2024) {
             }
         }
 
-    private fun loader() = load().map { Coord.parse(it) }
+    private fun loader() = load().map { it.toCoord() }
 }

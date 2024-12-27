@@ -236,6 +236,9 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
     fun equalsCoord(coord: Coord) = x == coord.x && y == coord.y
 }
 
+/**
+ * "x,y" formatted string to a Coord(x, y)
+ */
 fun String.toCoord(): Coord = Coord.parse(this)
 
 /**
@@ -341,6 +344,22 @@ fun Collection<Coord>.printify(full: Char = '#', empty: Char = '.', invert: Bool
                 }
             }.joinToString("\n") { it.joinToString("") }
 }
+
+/**
+ * Parses a list of Strings into a set of Coords with each char of the string stored inside
+ * Set filter to chars that should not produce a Coord (usually '.')
+ * Set blank to skip setting the char into the Coord (useful with filter, where "blank" coords are not needed)
+ * Each String is treated as a y row starting with the first row as y=0
+ * Top left will be 0,0
+ * Use invert to have the last String be y=0, bottom left will be 0,0
+ * Invert is useful when working with N,S,E,W to have Y increase while going "up"
+ */
+fun List<String>.parseCoords(invert: Boolean = false, filter: Set<Char> = setOf(), blank: Boolean = false): Set<Coord> = flatMapIndexed { r, s ->
+    val y = r.takeUnless { invert } ?: (size - r + 1)
+    s.mapIndexedNotNull { x, d ->
+        Coord(x, y, d.takeUnless { blank }).takeUnless { filter.contains(d) }
+    }
+}.toSet()
 
 enum class HexDir { E, W, NE, NW, SE, SW }
 
