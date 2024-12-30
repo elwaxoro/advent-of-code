@@ -1,6 +1,7 @@
 package org.elwaxoro.advent.y2015
 
 import org.elwaxoro.advent.PuzzleDayTester
+import org.elwaxoro.advent.combinations
 
 /**
  * Day 24: It Hangs in the Balance
@@ -11,35 +12,13 @@ class Dec24 : PuzzleDayTester(24, 2015) {
      * 1st compartment has to have the fewest packages
      * 1st compartment ties decided by product of packages
      * all 3 compartments must be equal
+     * first attempt was brute force but completely the wrong approach, got the right answer for part 1 but part 2 was running forever
+     * simplification: using every combination of groups of packages, starting from a single package and working up:
+     * find the lowest group that gets ANY combo to the right weight (compartments / X) and just return the min QE of that group size
+     * getting lucky here that the answer works without checking that the remaining packages can all be split by equal weight
      */
-    override fun part1(): Any = loadToInt().reversed().let { packages ->
-        sleighLoader(packages, packages.sum()/3) ?: -1
-    }
+    override fun part1(): Any = sleighLoader(loadToInt(), loadToInt().sum() / 3)
+    override fun part2(): Any = sleighLoader(loadToInt(), loadToInt().sum() / 4)
 
-    private var best = Long.MAX_VALUE
-
-    private fun sleighLoader(packages: List<Int>, equalLoad: Int, a: List<Int> = listOf(), b: List<Int> = listOf(), c: List<Int> = listOf()): Long? {
-        val qe = a.fold(1L) { x, y -> x * y }
-        if (qe >= best || a.sum() > equalLoad || b.sum() > equalLoad || c.sum() > equalLoad) {
-            return null
-        } else if (packages.isEmpty()) {
-            val aa = a.sum()
-            if (aa == b.sum() && aa == c.sum() && a.size < b.size && a.size < c.size) {
-                best = qe
-                println("found a good one! $qe: $a $b $c")
-                return qe
-            } else {
-//                println("failed $a $b $c")
-                return null
-            }
-        } else {
-            return packages.flatMap { p ->
-                listOfNotNull(
-                    sleighLoader(packages - p, equalLoad, a + p, b, c),
-                    sleighLoader(packages - p, equalLoad, a, b + p, c),
-                    sleighLoader(packages - p, equalLoad, a, b, c + p)
-                )
-            }.minOrNull()
-        }
-    }
+    private fun sleighLoader(p: List<Int>, t: Int): Long = p.indices.firstNotNullOf { i -> p.combinations(i).filter { it.sum() == t }.minOfOrNull { it.fold(1L) { acc, j -> acc * j } } }
 }
