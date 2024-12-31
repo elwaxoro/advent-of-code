@@ -1,13 +1,10 @@
 package org.elwaxoro.advent.y2019
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import org.elwaxoro.advent.PuzzleDayTester
-import org.elwaxoro.advent.drainToList
 import org.elwaxoro.advent.permutations
-import org.elwaxoro.advent.toChannel
 
 /**
  * Day 7: Amplification Circuit
@@ -18,58 +15,37 @@ class Dec07 : PuzzleDayTester(7, 2019) {
      * Create all permutations of the list [0,1,2,3,4], then find the max of running each list
      * Running a list by looping each item, feeding output of the previous into the next
      */
-    override fun part1(): Any = Dec7Part1Compy(loadToInt(delimiter = ",")).let { compy ->
-        (0..4).toList().permutations().maxOf { phaseSettings ->
-            phaseSettings.fold(0) { acc, setting ->
-                compy.run(listOf(setting, acc))
+    override fun part1(): Any = runBlocking {
+        ElfCode(loadToLong(delimiter = ",")).let { elf ->
+            (0..4L).permutations().maxOf { phaseSettings ->
+                phaseSettings.fold(0L) { acc, setting ->
+                    val o = mutableListOf<Long>()
+                    val i = mutableListOf(setting, acc)
+                    elf.runner({}, { i.removeFirst() }, { o.add(it) })
+                    o.last()
+                }
             }
         }
-    } == 79723
-
-    private class Dec7Part1Compy(program: List<Int>) : Intercode(program) {
-        @OptIn(ExperimentalCoroutinesApi::class)
-        fun run(input: List<Int>): Int = runBlocking {
-            val output = Channel<Int>(capacity = Channel.UNLIMITED)
-            run(input.toChannel(), output, program.toMutableList())
-            // compy might output multiple items, just get the last one
-            output.drainToList().last()
-        }
-    }
+    } == 79723L
 
     override fun part2(): Any = runBlocking {
         val amps = listOf("A", "B", "C", "D", "E")
-        val code = loadToInt(delimiter = ",")
-        (5..9).toList().permutations().maxOf { phaseSetting ->
-            // kept getting input and output channels mixed up somehow, so lets be extremely methodical here
-            val inputMap = mutableMapOf<String, Channel<Int>>()
-            val outputMap = mutableMapOf<String, Channel<Int>>()
-
-            // load the output channels
-            amps.map { name ->
-                outputMap[name] = Channel(capacity = Channel.UNLIMITED)
-            }
+        val code = loadToLong(delimiter = ",")
+        (5..9L).permutations().maxOf { phaseSettings ->
+            val inputs = mutableMapOf<String, Channel<Long>>()
+            val outputs = mutableMapOf<String, Channel<Long>>()
             // connect the outputs to the inputs
-            amps.zipWithNext { x, y ->
-                if (x == "A") {
-                    inputMap[x] = outputMap["E"]!!
-                }
-                inputMap[y] = outputMap[x]!!
+            amps.plus("A").zipWithNext { a, b ->
+                outputs[a] = Channel(capacity = Channel.UNLIMITED)
+                inputs[b] = outputs.getValue(a)
             }
-            // load the initial input values and fire it all up!
-            amps.mapIndexed { idx, name ->
-                inputMap[name]!!.send(phaseSetting[idx])
-                if (name == "A") {
-                    inputMap[name]!!.send(0)
-                }
-
-                async {
-                    // println("Starting $name, input: ${inputMap[name]!!.hashCode()} output: ${outputMap[name]!!.hashCode()}")
-                    Intercode(code, name = name).run(inputMap[name]!!, outputMap[name]!!)
-                }
-            }.map { it.join() } // wait for everyone to finish
-
-            // collect the final amp E output
-            outputMap["E"]!!.receive()
+            // load initial values
+            amps.mapIndexed { i, a -> inputs.getValue(a).send(phaseSettings[i]) }
+            inputs.getValue("A").send(0)
+            // start all the amps, wait for them all to complete
+            amps.map { amp -> async { ElfCode(code).runner({}, { inputs.getValue(amp).receive() }, { outputs.getValue(amp).send(it) }) } }.map { it.join() }
+            // fetch the final output from amp E
+            outputs.getValue("E").receive()
         }
-    } == 70602018
+    } == 70602018L
 }

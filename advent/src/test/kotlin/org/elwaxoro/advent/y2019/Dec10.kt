@@ -2,8 +2,6 @@ package org.elwaxoro.advent.y2019
 
 import org.elwaxoro.advent.Coord
 import org.elwaxoro.advent.PuzzleDayTester
-import org.elwaxoro.advent.printify
-import kotlin.math.atan2
 
 /**
  * Day 10: Monitoring Station
