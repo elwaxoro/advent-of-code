@@ -1,5 +1,6 @@
 package org.elwaxoro.advent.y2019
 
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -26,6 +27,7 @@ class Dec11: PuzzleDayTester(11, 2019) {
      */
     override fun part2(): Any = goRobot(Coord(0, 0, '1')).filter { it.d == '1' }.map { it.copyD('X') }.printify(invert = true, empty = ' ')
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun goRobot(start: Coord) = runBlocking {
         ElfCode(loadToLong(delimiter = ",")).let { robot ->
             var pos = start
@@ -35,9 +37,9 @@ class Dec11: PuzzleDayTester(11, 2019) {
             val output = Channel<Long>(capacity = Channel.UNLIMITED)
             input.send(pos.dLong())
             launch {
-                robot.runner({it.addAll(listOf(0L).padTo(2000))}, { input.receive() }, { output.send(it) })
+                robot.runner({it.addAll(listOf(0L).padTo(2000))}, { input.receive() }, { output.send(it) }, { output.close() })
             }
-            while (robot.isRunning) {
+            while (!output.isClosedForReceive) {
                 // robot starts out every time already on the position it's going to paint, so record the output color here as a new coord
                 val out = output.receive()
                 visited.add(pos.copyD(out.toInt().digitToChar()))

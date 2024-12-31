@@ -8,10 +8,10 @@ import org.elwaxoro.advent.takeSplit
  * Dec 5: added input, output, jump-if-true, jump-if-false, less-than, equals, position and immediate get modes, converted from Int to Long
  * Dec 7: added async support (suspend functions for input / output to allow channels)
  * Dec 9: added relative mode, expanding memory (use setup function to expand manually)
+ * Dec 11: added optional exit support, in case input/output are channels
  */
 class ElfCode(
     private val originalProgram: List<Long>,
-    var isRunning: Boolean = true,
     private var relativeBase: Long = 0,
     private var modes: String = "000",
     private var prog: MutableList<Long> = mutableListOf(),
@@ -23,7 +23,6 @@ class ElfCode(
     }
 
     private fun reset() {
-        isRunning = true
         prog = originalProgram.toMutableList()
         modes = "000"
         idx = 0L
@@ -32,15 +31,16 @@ class ElfCode(
     suspend fun runner(
         setup: (program: MutableList<Long>) -> Unit = { },
         input: suspend () -> Long = { 1 },
-        output: suspend (out: Long) -> Unit = { println("Output: $it") }
+        output: suspend (out: Long) -> Unit = { println("Output: $it") },
+        exit: suspend () -> Unit = { },
     ): List<Long> {
         reset()
         setup.invoke(prog)
-
+        var isRunning = true
         while (isRunning) {
             val (m, op) = "${prog[idx.toInt()]}".padStart(5, padChar = '0').takeSplit(3)
             modes = m
-            //println("modified $idx = ${prog[idx.toInt()]} into op $op with modes $modes $prog")
+            // println("modified $idx = ${prog[idx.toInt()]} into op $op with modes $modes $prog")
             when (op.toInt()) {
                 1 -> { // addition
                     put(3, get(1) + get(2))
@@ -108,15 +108,15 @@ class ElfCode(
                 else -> throw IllegalStateException("Unknown opcode $op with mode $modes at idx $idx! Full prog: $prog")
             }
         }
+        exit.invoke()
         return prog
     }
 
     private fun get(param: Int): Long = prog[mode(modes, param, idx + param)]
-    private fun put(param: Int, value: Long): Unit {
+    private fun put(param: Int, value: Long) {
         prog[mode(modes, param, idx + param)] = value
     }
 
-    // removed -1
     private fun mode(modes: String, modeIdx: Int, codeIdx: Long): Int = mode(modes[modes.length - modeIdx].digitToInt(), codeIdx)
 
     private fun mode(mode: Int, idx: Long): Int =
