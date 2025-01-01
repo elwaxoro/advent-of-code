@@ -9,6 +9,7 @@ import org.elwaxoro.advent.takeSplit
  * Dec 7: added async support (suspend functions for input / output to allow channels)
  * Dec 9: added relative mode, expanding memory (use setup function to expand manually)
  * Dec 11: added optional exit support, in case input/output are channels
+ * Dec 15: added custom input spike to terminate early (Long.MAX_VALUE)
  */
 class ElfCode(
     private val originalProgram: List<Long>,
@@ -53,8 +54,14 @@ class ElfCode(
                 }
 
                 3 -> { // input
-                    put(1, input.invoke())
-                    idx += 2
+                    val i = input.invoke()
+                    if (i == Long.MAX_VALUE) {
+                        // custom input break
+                        isRunning = false
+                    } else {
+                        put(1, i)
+                        idx += 2
+                    }
                 }
 
                 4 -> { // output

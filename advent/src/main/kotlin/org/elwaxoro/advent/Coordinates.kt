@@ -94,7 +94,7 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
         /**
          * "x,y" string to coord
          */
-        fun parse(str: String) = str.replace("(","").replace(")","").split(",").map { it.trim() }.let {
+        fun parse(str: String) = str.replace("(", "").replace(")", "").split(",").map { it.trim() }.let {
             Coord(it[0].toInt(), it[1].toInt())
         }
     }
@@ -234,6 +234,30 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
      * Equals check that ignores 'd' and just compares x,y values
      */
     fun equalsCoord(coord: Coord) = x == coord.x && y == coord.y
+
+    /**
+     * Gets the cardinal direction towards the other coord
+     * If other coord is not exactly in any direction, an exception is thrown
+     * If other coord is at the same position, an exception is thrown
+     */
+    fun dirTo(that: Coord): Dir =
+        if (x == that.x && y == that.y) {
+            throw IllegalStateException("No direction possible: $this == $that ")
+        } else if (x == that.x) {
+            if (y < that.y) {
+                Dir.N
+            } else {
+                Dir.S
+            }
+        } else if (y == that.y) {
+            if (x < that.x) {
+                Dir.E
+            } else {
+                Dir.W
+            }
+        } else {
+            throw IllegalStateException("No direction possible: $this vs $that")
+        }
 }
 
 /**
@@ -595,7 +619,7 @@ fun List<LCoord>.shoelaceArea(): Double {
     for (i in 0 until n - 1) {
         a += this[i].x * this[i + 1].y - this[i + 1].x * this[i].y
     }
-    return abs(a + this[n - 1].x * this[0].y -this[0].x * this[n - 1].y) / 2.0
+    return abs(a + this[n - 1].x * this[0].y - this[0].x * this[n - 1].y) / 2.0
 }
 
 /**
