@@ -68,12 +68,25 @@ enum class Dir {
         W -> 'W'
     }
 
-    fun toCaret(): Char = when (this) {
-        N -> '^'
-        S -> 'v'
-        E -> '>'
-        W -> '<'
-    }
+    /**
+     * Use invert when top left is 0,0 so going "south" means decreasing Y which means going "up"
+     */
+    fun toCaret(invert: Boolean = false): Char =
+        if (invert) {
+            when (this) {
+                N -> 'v'
+                S -> '^'
+                E -> '>'
+                W -> '<'
+            }
+        } else {
+            when (this) {
+                N -> '^'
+                S -> 'v'
+                E -> '>'
+                W -> '<'
+            }
+        }
 }
 
 enum class Turn {
