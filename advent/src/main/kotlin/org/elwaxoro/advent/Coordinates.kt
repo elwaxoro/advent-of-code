@@ -243,6 +243,8 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
         }
     }
 
+    fun slopeTo(that: Coord): Double = (that.y - y) / (that.x.toDouble() - x)
+
     /**
      * Equals check that ignores 'd' and just compares x,y values
      */
