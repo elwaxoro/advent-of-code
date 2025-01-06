@@ -70,7 +70,7 @@ class Dec19 : PuzzleDayTester(19, 2019) {
      */
     override fun part1(): Any = runBlocking {
         TractorBeam(loadToLong(delimiter = ",")).let { t ->
-            (0..49L).sumOf { y -> (0..49L).count { x -> t.placeDrone(x, y) } }
+            (0..49).sumOf { y -> (0..49).count { x -> t.placeDrone(x, y) } }
         }
     } == 131
 
@@ -103,14 +103,15 @@ class Dec19 : PuzzleDayTester(19, 2019) {
     private class TractorBeam(
         val code: List<Long>,
     ) {
-        suspend fun placeDrone(x: Int, y: Int): Boolean = placeDrone(x.toLong(), y.toLong())
-
-        suspend fun placeDrone(x: Long, y: Long): Boolean {
+        /**
+         * returns true if drone is within the tractor beam
+         */
+        suspend fun placeDrone(x: Int, y: Int): Boolean {
             val input = mutableListOf(x, y)
             var out = -1L
             ElfCode(code).runner(
                 setup = ElfCode.memExpander(5000),
-                input = { input.removeFirst() },
+                input = { input.removeFirst().toLong() },
                 output = { out = it },
             )
             return out == 1L
