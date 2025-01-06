@@ -79,20 +79,20 @@ class Dec19 : PuzzleDayTester(19, 2019) {
      * From part 1 output, the slope of the beam is less than 45 degrees
      * Could probably calculate the slope of the top and bottom edges, then math it in one shot?
      *
-     * Lazy idea: beam surfer! start at (100,100) and repeat these steps:
+     * Lazy idea: beam surfer! let's follow the "bottom" edge of the beam. start at (100,100) and repeat these steps:
      * start at 100, 100 so all coordinates are always positive per "Negative numbers are invalid and will confuse the drone"
      * 1. test (x,y)
-     * 2. if pass: test "opposite" (x+99, y-99). if that passes too we're done, if not, move down
+     * 2. if pass: test "opposite" (x+99, y-99). if that passes too we're done (answer is (x, y-99)), if not, move down
      * 3. if fail: move right
      * 4. repeat!
      * This solution totally worked! and only takes about 168ms so not really worth further optimization
      */
-    override fun part2(): Any = runBlocking { beamSurfer(100, 100, TractorBeam(loadToLong(delimiter = ","))).let { a -> a.x * 10000 + a.y - 99 } } == 15231022
+    override fun part2(): Any = runBlocking { beamSurfer(100, 100, TractorBeam(loadToLong(delimiter = ","))).let { a -> a.x * 10000 + a.y } } == 15231022
 
     private suspend fun beamSurfer(x: Int, y: Int, t: TractorBeam): Coord =
         if (t.placeDrone(x, y)) {
             if (t.placeDrone(x + 99, y - 99)) {
-                Coord(x, y)
+                Coord(x, y - 99)
             } else {
                 beamSurfer(x, y + 1, t)
             }
