@@ -75,7 +75,7 @@ class Dec19 : PuzzleDayTester(19, 2019) {
     } == 131
 
     /**
-     * Need to find a drone position (x,y) where (x+99,y) and (x,y-99) are also inside the beam
+     * Need to find a drone position (x,y) where (x+99,y) and (x,y+99) are also inside the beam
      * From part 1 output, the slope of the beam is less than 45 degrees
      * Could probably calculate the slope of the top and bottom edges, then math it in one shot?
      *
