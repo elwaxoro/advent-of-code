@@ -81,9 +81,9 @@ class Dec19 : PuzzleDayTester(19, 2019) {
      * Need to find a drone position (x,y) where (x+99,y) and (x,y-99) are also inside the beam
      * From part 1 output, the slope of the beam is less than 45 degrees
      * Could probably calculate the slope of the top and bottom edges, then math it in one shot?
-     * Lazy idea: beam surfer! start at 0,0 and repeat these steps:
-     * 1. test coord
-     * 2. if pass: test "opposite" (x+99, y-99) coord. if that passes too we're done, if not, move down
+     * Lazy idea: beam surfer! start at (100,100) and repeat these steps:
+     * 1. test (x,y)
+     * 2. if pass: test "opposite" (x+99, y-99). if that passes too we're done, if not, move down
      * 3. if fail: move right
      * 4. repeat!
      * This solution totally worked! and only takes about 168ms so not really worth further optimization
