@@ -80,14 +80,14 @@ class Dec19 : PuzzleDayTester(19, 2019) {
      * Could probably calculate the slope of the top and bottom edges, then math it in one shot?
      *
      * Lazy idea: beam surfer! let's follow the "bottom" edge of the beam. start at (100,100) and repeat these steps:
-     * start at 100, 100 so all coordinates are always positive per "Negative numbers are invalid and will confuse the drone"
+     * start at (0,100) so all coordinates are always positive per "Negative numbers are invalid and will confuse the drone"
      * 1. test (x,y)
      * 2. if pass: test "opposite" (x+99, y-99). if that passes too we're done (answer is (x, y-99)), if not, move down
      * 3. if fail: move right
      * 4. repeat!
      * This solution totally worked! and only takes about 168ms so not really worth further optimization
      */
-    override fun part2(): Any = runBlocking { beamSurfer(100, 100, TractorBeam(loadToLong(delimiter = ","))).let { a -> a.x * 10000 + a.y } } == 15231022
+    override fun part2(): Any = runBlocking { beamSurfer(0, 100, TractorBeam(loadToLong(delimiter = ","))).let { a -> a.x * 10000 + a.y } } == 15231022
 
     private suspend fun beamSurfer(x: Int, y: Int, t: TractorBeam): Coord =
         if (t.placeDrone(x, y)) {
