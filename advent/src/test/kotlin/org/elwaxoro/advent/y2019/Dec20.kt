@@ -89,6 +89,8 @@ class Dec20 : PuzzleDayTester(20, 2019) {
         fun getExitPortal(entry: Coord): Coord? = portals[entry]?.let { name -> portals.filterValues { it == name }.filter { it.key != entry }.keys.single() }
 
         /**
+         * Basically just BFS for part 1 and part 2
+         * Only changes from part 1 to 2 are the portal rules and visited keys are a triple (x, y, d) instead of just (x, y)
          * Max depth can go up to chars.size depending on needs, 25 was deep enough for my puzzle input
          */
         fun explore(maxDepth: Int = 0): Int {
@@ -103,7 +105,7 @@ class Dec20 : PuzzleDayTester(20, 2019) {
                 // check if current coord is a portal, try go to in/out depending on rules
                 val teleport: Coord? = getExitPortal(coord)?.let { exit ->
                     if (maxDepth == 0) {
-                        exit.copyD('0') // part 1, no layers just stay at 0
+                        exit.copyD('0') // part 1, no layers all portals are active and don't change depth
                     } else if (isOutsidePortal(coord) && depth > 0) {
                         // outside portals go a layer shallower (except layer 0 where they aren't real)
                         exit.copyD(chars[depth - 1])
@@ -111,7 +113,7 @@ class Dec20 : PuzzleDayTester(20, 2019) {
                         // inside portals go a layer deeper (except layer maxDepth where they aren't real)
                         exit.copyD(chars[depth + 1])
                     } else {
-                        // the portal isn't available at this depth
+                        // this portal isn't available at this depth
                         null
                     }
                 }
