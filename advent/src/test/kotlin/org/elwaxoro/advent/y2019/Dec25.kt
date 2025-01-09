@@ -11,11 +11,13 @@ import org.elwaxoro.advent.remove
 class Dec25 : PuzzleDayTester(25, 2019) {
 
     /**
-     * I did this by hand as I explored the maze, it gathers up all the non-deadly items and stops at the security checkpoint
-     * From there, just gotta try all combinations of items by dropping the others
+     * I did this by hand as I explored the maze, first gather all the non-deadly items and stop at the security checkpoint
+     * then: try all combinations of items by dropping the ones I don't want
+     * on failure: reload the entire engine, repeat the maze, try something else
+     * I did notice that on security checkpoint failure, I could pick up the items from the floor that I want to use...
      */
     override fun part1(): Any = runBlocking {
-        val collectPassages = """
+        val explore = """
             west
             take mutex
             south
@@ -32,7 +34,6 @@ class Dec25 : PuzzleDayTester(25, 2019) {
             south
             take hologram
             north
-            inv
             north
             north
             north
@@ -56,7 +57,7 @@ class Dec25 : PuzzleDayTester(25, 2019) {
         (1..items.size).firstNotNullOf { i ->
             items.combinations(i).toList().mapNotNull { combo ->
                 val toDrop = items.minus(combo)
-                val commands = collectPassages + toDrop.joinToString("\n") { "drop $it" } + "\nnorth\n\n"
+                val commands = explore + toDrop.joinToString("\n") { "drop $it" } + "\nnorth\n\n"
                 Droid(loadToLong(delimiter = ","), commands).runner()
             }.singleOrNull()
         }
@@ -81,6 +82,7 @@ class Dec25 : PuzzleDayTester(25, 2019) {
             lastOutput = out
             val char = out.toInt().toChar()
             outputStr += char
+            // display mode
 //            if (char == '\n') {
 //                println(outputStr)
 //                outputStr = ""
