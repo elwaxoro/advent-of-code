@@ -8,7 +8,7 @@ import org.elwaxoro.advent.PuzzleDayTester
 class Dec20: PuzzleDayTester(20, 2015) {
     val input = 33100000
 
-    override fun part1(): Any = "TODO"
+    override fun part1(): Any = "Not Done"
 
-    override fun part2(): Any = "TODO"
+    override fun part2(): Any = "Not Done"
 }

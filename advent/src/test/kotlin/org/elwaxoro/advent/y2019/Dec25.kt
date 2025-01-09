@@ -63,6 +63,8 @@ class Dec25 : PuzzleDayTester(25, 2019) {
         }
     } == 35717128
 
+    override fun part2(): Any = "Merry Christmas!"
+
     private class Droid(
         val code: List<Long>,
         val raw: String,
