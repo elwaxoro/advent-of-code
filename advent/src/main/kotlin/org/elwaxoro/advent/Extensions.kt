@@ -4,6 +4,11 @@ import java.math.BigInteger
 import kotlin.math.pow
 
 /**
+ * Note: NOT sum of prime factors, just all factors
+ */
+fun Int.sumOfFactors(): Int = (1..this).fold(0) { acc, i -> (acc + i).takeIf { this % i == 0 } ?: acc }
+
+/**
  * Nullable Long plusser, null defaults to 0
  */
 fun Long.plusNull(that: Long?): Long = (that ?: 0L) + this
