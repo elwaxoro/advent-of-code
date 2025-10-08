@@ -29,6 +29,8 @@ enum class Dir {
                 '<' -> W
                 else -> throw UnsupportedOperationException("Can't turn $caret from ^v>< to NSWE!")
             }
+
+        fun fromChar(nsew: Char): Dir = Dir.valueOf("$nsew")
     }
 
     /**
