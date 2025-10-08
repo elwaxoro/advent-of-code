@@ -7,7 +7,7 @@ import org.elwaxoro.advent.PuzzleDayTester
 /**
  * Day 22: Mode Maze
  */
-class Day22 : PuzzleDayTester(22, 2018) {
+class Dec22 : PuzzleDayTester(22, 2018) {
 
     override fun part1(): Any = loader().let { (depth, target) ->
         expandMap(depth, target).values.sum()
