@@ -23,7 +23,7 @@ class Day22 : PuzzleDayTester(22, 2018) {
      */
     override fun part2(): Any {
 
-        return super.part2()
+        return "TODO"
     }
 
     /**
