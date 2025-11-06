@@ -3,9 +3,6 @@
 # advent-of-code
 Just having some fun solving [Advent of Code](https://adventofcode.com/) with [Kotlin](https://kotlinlang.org/)
 
-# 2024 solutions
-Solves for 2024 are [here](https://github.com/elwaxoro/advent-of-code/tree/main/advent/src/test/kotlin/org/elwaxoro/advent/y2024)
-
 ## How to has?
 
 Solve puzzles as unit tests, create each day in a file like `advent/src/test/kotlin/org/elwaxoro/advent/y2022/Dec01.kt`
