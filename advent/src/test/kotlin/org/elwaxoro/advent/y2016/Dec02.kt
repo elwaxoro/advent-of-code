@@ -4,6 +4,9 @@ import org.elwaxoro.advent.Coord
 import org.elwaxoro.advent.Dir
 import org.elwaxoro.advent.PuzzleDayTester
 
+/**
+ * Day 2: Bathroom Security
+ */
 class Dec02: PuzzleDayTester(2, 2016) {
 
     override fun part1(): Any = codeSolver(

@@ -191,3 +191,8 @@ fun <T> Iterable<T>.permutations(length: Int? = null): Sequence<List<T>> =
             return@sequence
         }
     }
+
+// kotlin only destructures up to 5, these add a few more
+operator fun <T> List<T>.component6() = this[5]
+operator fun <T> List<T>.component7() = this[6]
+operator fun <T> List<T>.component8() = this[7]

@@ -5,6 +5,9 @@ import org.elwaxoro.advent.Dir
 import org.elwaxoro.advent.PuzzleDayTester
 import org.elwaxoro.advent.Turn
 
+/**
+ * Day 1: No Time for a Taxicab
+ */
 class Dec01 : PuzzleDayTester(1, 2016) {
 
     override fun part1(): Any = parse().fold(Position()) { acc, move ->

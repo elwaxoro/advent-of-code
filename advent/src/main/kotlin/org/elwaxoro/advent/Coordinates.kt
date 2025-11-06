@@ -438,6 +438,7 @@ data class Coord3D(val x: Int = 0, val y: Int = 0, val z: Int = 0, val w: Int = 
     fun add(that: Coord3D): Coord3D = Coord3D(x + that.x, y + that.y, z + that.z, w)
     fun subtract(that: Coord3D): Coord3D = Coord3D(x - that.x, y - that.y, z - that.z, w)
     fun manhattan(that: Coord3D): Int = abs(x - that.x) + abs(y - that.y) + abs(z - that.z)
+
     fun toMatrix(): Matrix4 = Matrix4(
         1, 0, 0, x,
         0, 1, 0, y,
@@ -644,3 +645,14 @@ fun List<LCoord>.shoelaceArea(): Double {
  * https://en.wikipedia.org/wiki/Pick%27s_theorem
  */
 fun picksTheorem(interior: Double, boundary: Double): Double = interior + (boundary / 2.0) - 1
+
+data class Coord4D(val x: Int, val y: Int, val z: Int, val w: Int) {
+
+    companion object {
+        fun parse(string: String): Coord4D = string.split(",").map { it.trim() }.let { (a, b, c, d) ->
+            Coord4D(a.toInt(), b.toInt(), c.toInt(), d.toInt())
+        }
+    }
+
+    fun manhattan(that: Coord4D): Int = abs(x - that.x) + abs(y - that.y) + abs(z - that.z) + abs(w - that.w)
+}
