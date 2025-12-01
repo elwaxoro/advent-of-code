@@ -9,13 +9,7 @@ import kotlin.math.sign
  */
 class Dec01 : PuzzleDayTester(1, 2025) {
 
-    override fun part1(): Any = loader().let { input ->
-        var d = 50
-        input.map { i ->
-            d = (d + i) % 100
-            d
-        }.count { it == 0 }
-    } == 969
+    override fun part1(): Any = loader().runningFold(50) { acc, i -> (acc + i) % 100 }.count { it == 0 } == 969
 
     override fun part2(): Any = loader().let { input ->
         var d = 50
