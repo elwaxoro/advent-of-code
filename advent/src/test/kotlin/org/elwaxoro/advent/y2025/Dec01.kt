@@ -7,19 +7,26 @@ import kotlin.math.sign
 /**
  * Day 1: Secret Entrance
  *
- * Insight: it doesn't actually matter if the dial is kept strictly between 0-99, it can be negative as long as application of "% 100" is consistent
+ * Idea: keep a list of all dial positions, look for zeroes at the end
+ * Insight: it doesn't matter if the dial is kept between 0-99
+ * Just keep dial position list as a running sum then apply % 100 at the end to count up the zeros
  */
 class Dec01 : PuzzleDayTester(1, 2025) {
 
-    override fun part1(): Any = loader().spinDial(50).count { it == 0 } == 969
+    override fun part1(): Any = loader().spinDial(50).countZeroes() == 969
 
+    /**
+     * for each input - apply it as a repeated list of +1, +1, +1, ... or -1, -1, -1, ...
+     */
     override fun part2(): Any = loader().fold(50 to 0) { (dial, zeroes), i ->
         List(abs(i)) { i.sign }.spinDial(dial).let { innerSpin ->
-            innerSpin.last() to (zeroes + innerSpin.drop(1).count { it == 0 })
+            innerSpin.last() to (zeroes + innerSpin.drop(1).countZeroes())
         }
     }.second == 5887
 
-    private fun List<Int>.spinDial(initial: Int): List<Int> = runningFold(initial) { acc, i -> (acc + i) % 100 }
+    private fun List<Int>.spinDial(initial: Int): List<Int> = runningFold(initial) { acc, i -> acc + i }
+
+    private fun List<Int>.countZeroes() = count { it % 100 == 0 }
 
     private fun loader() = load().map { it.replace("R", "").replace("L", "-").toInt() }
 }
