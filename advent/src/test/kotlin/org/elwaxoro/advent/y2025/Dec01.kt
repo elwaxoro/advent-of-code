@@ -2,11 +2,12 @@ package org.elwaxoro.advent.y2025
 
 import org.elwaxoro.advent.PuzzleDayTester
 import kotlin.math.abs
+import kotlin.math.sign
 
 /**
  * Day 1: Secret Entrance
  */
-class Dec01: PuzzleDayTester(1, 2025) {
+class Dec01 : PuzzleDayTester(1, 2025) {
 
     override fun part1(): Any = loader().let { input ->
         var d = 50
@@ -14,33 +15,17 @@ class Dec01: PuzzleDayTester(1, 2025) {
             d = (d + i) % 100
             d
         }.count { it == 0 }
-    }
+    } == 969
 
     override fun part2(): Any = loader().let { input ->
         var d = 50
-        var zeroes = 0
-        input.map { i ->
-            (1..abs(i)).forEach {
-                if(i <0){
-                    d--
-                }else{
-                    d++
-                }
-                d%=100
-                if(d==0){
-                    zeroes++
-                }
+        input.flatMap { i ->
+            (1..abs(i)).map {
+                d = (d + i.sign) % 100
+                d
             }
-        }
-        zeroes
-    }
+        }.count { it == 0 }
+    } == 5887
 
-    private fun loader() = load().map {
-        val d = it.drop(1).toInt()
-        if (it.startsWith('L')) {
-            d * -1
-        } else {
-            d
-        }
-    }
+    private fun loader() = load().map { it.replace("R", "").replace("L", "-").toInt() }
 }
