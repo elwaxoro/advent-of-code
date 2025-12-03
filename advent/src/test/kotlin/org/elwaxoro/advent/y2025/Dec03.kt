@@ -14,12 +14,6 @@ class Dec03 : PuzzleDayTester(3, 2025) {
 
     override fun part1(): Any = loader().sumOf { it.joltage(2) } == 17092L
 
-    /**
-     * Turn on 12 batteries instead of 2
-     * same approach but with a list?
-     * battery > n && idx < bank.size - 11 + n?
-     * ie: don't select a new max if there's not enough room left in the bank for the remaining digits
-     */
     override fun part2(): Any = loader().sumOf { it.joltage(12) } == 170147128753455
 
     private fun List<Int>.joltage(count: Int): Long {
