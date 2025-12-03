@@ -5,45 +5,30 @@ import org.elwaxoro.advent.splitToInt
 
 /**
  * Day 3: Lobby
+ *
+ * Part1 idea: loop each bank once, pick primary and secondary maximums as you go, don't reset primary if almost to end of bank
+ * Part2 idea: same as part 1, but with a list, don't reset max N if bankIdx >= bank.size - 11 + idxN (ie leave room for the remaining batteries that need a max)
+ * After solving part2 - it solves part1 just fine too
  */
 class Dec03 : PuzzleDayTester(3, 2025) {
 
-    /**
-     * Idea: loop each bank once, pick primary and secondary maximums as you go
-     * Don't reset primary if almost to end of list
-     */
-    override fun part1(): Any = loader().sumOf { bank ->
-        var a = 0
-        var b = 0
-        bank.forEachIndexed { idx, battery ->
-            if (battery > a && idx < bank.size - 1) {
-                a = battery
-                b = 0
-            } else if (battery > b) {
-                b = battery
-            }
-        }
-        if (a == 0 || b == 0) {
-            throw IllegalStateException("failed to find a good voltage for $bank")
-        }
-        a * 10 + b
-    } == 17092
+    override fun part1(): Any = loader().sumOf { it.joltage(2) } == 17092L
 
     /**
      * Turn on 12 batteries instead of 2
      * same approach but with a list?
-     * battery > n && idx < bank.size - 12 + n?
+     * battery > n && idx < bank.size - 11 + n?
      * ie: don't select a new max if there's not enough room left in the bank for the remaining digits
-     * 170108965159310 is too low
      */
-    override fun part2(): Any = loader().sumOf { bank ->
-        val joltage = MutableList(12) { 0 }
+    override fun part2(): Any = loader().sumOf { it.joltage(12) } == 170147128753455
 
-        bank.forEachIndexed { idx, battery ->
+    private fun List<Int>.joltage(count: Int): Long {
+        val joltage = MutableList(count) { 0 }
+        forEachIndexed { idx, battery ->
             var found = false
             var foundIdx = -1
             joltage.forEachIndexed { jidx, max ->
-                if (battery > max && idx < bank.size - 11 + jidx && !found) {
+                if (battery > max && idx < size - (count - 1) + jidx && !found) {
                     found = true
                     foundIdx = jidx
                 }
@@ -55,12 +40,11 @@ class Dec03 : PuzzleDayTester(3, 2025) {
                 }
             }
         }
-
         if (joltage.any { it == 0 }) {
-            throw IllegalStateException("failed to find a good voltage for $bank")
+            throw IllegalStateException("failed to find a good voltage for $this")
         }
-        joltage.joinToString("").toLong()
-    } == 170147128753455
+        return joltage.joinToString("").toLong()
+    }
 
     private fun loader() = load().map { it.splitToInt() }
 }
