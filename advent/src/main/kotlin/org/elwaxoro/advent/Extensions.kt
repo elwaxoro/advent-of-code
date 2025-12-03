@@ -1,6 +1,7 @@
 package org.elwaxoro.advent
 
 import java.math.BigInteger
+import java.security.MessageDigest
 import kotlin.math.pow
 
 /**
@@ -18,6 +19,12 @@ fun Long.plusNull(that: Long?): Long = (that ?: 0L) + this
  * Ex: "01234" becomes [0, 1, 2, 3, 4]
  */
 fun String.splitToInt(): List<Int> = map(Character::getNumericValue)
+
+/**
+ * Creates a hex string MD5 hash of the input string
+ */
+private val MD5 = MessageDigest.getInstance("MD5")
+fun String.md5(): String = BigInteger(1, MD5.digest(toByteArray())).toString(16).padStart(32, '0')
 
 /**
  * Replace matching values
