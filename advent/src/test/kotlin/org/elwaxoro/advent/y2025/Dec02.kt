@@ -11,7 +11,7 @@ class Dec02: PuzzleDayTester(2, 2025) {
 
     override fun part2(): Any = loader().countInvalid("""(.+)\1+""".toRegex()) == 37432260594
 
-    private fun List<LongRange>.countInvalid(regex: Regex): Long = map { range -> range.filter { regex.matches("$it") } }.flatten().sum()
+    private fun List<LongRange>.countInvalid(regex: Regex): Long = flatMap { range -> range.filter { regex.matches("$it") } }.sum()
 
     private fun loader() = loadToString().split(",").map { it.split("-").let { LongRange(it[0].toLong(), it[1].toLong()) } }
 }
