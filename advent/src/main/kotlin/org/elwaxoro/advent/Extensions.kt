@@ -2,6 +2,8 @@ package org.elwaxoro.advent
 
 import java.math.BigInteger
 import java.security.MessageDigest
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.pow
 
 /**
@@ -41,6 +43,37 @@ fun Int.toward(to: Int): IntProgression = IntProgression.fromClosedRange(this, t
  * Pads a progression of Int to the desired size, using the final Int as the pad value
  */
 fun IntProgression.padTo(newSize: Int): List<Int> = toList().padTo(newSize)
+
+/**
+ * Find all range pairs with overlap and merge them
+ * Note (0..9)(10..20) is considered an overlap and becomes (0..20)
+ */
+fun MutableSet<LongRange>.mergeAllOverlap(): MutableSet<LongRange> {
+    do {
+        val count = size
+        findMerge()
+    } while (count != size)
+    return this
+}
+
+/**
+ * Find the first pair of ranges with overlap, merge them and return
+ * Note (0..9)(10..20) is considered an overlap and becomes (0..20)
+ */
+fun MutableSet<LongRange>.findMerge() {
+    forEach { a ->
+        forEach { b ->
+            if (a != b && a.last + 1 >= b.first && a.first <= b.first) {
+                val start = min(a.first, b.first)
+                val end = max(a.last, b.last)
+                remove(a)
+                remove(b)
+                add(LongRange(start, end))
+                return
+            }
+        }
+    }
+}
 
 /**
  * Pads a list of anything to the desired size, using the final object as the pad object
