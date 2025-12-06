@@ -9,22 +9,20 @@ import org.elwaxoro.advent.rowColSwap
 class Dec06 : PuzzleDayTester(6, 2025) {
 
     override fun part1(): Any = loader().sumOf { problem ->
-        if (problem.last().contains("*")) {
-            problem.dropLast(1).fold(1L) { acc, str -> acc * str.trim().toLong() }
-        } else {
-            problem.dropLast(1).fold(0L) { acc, str -> acc + str.trim().toLong() }
-        }
+        problem.extractNumbers(false).solve(problem.last())
     } == 5361735137219
 
     override fun part2(): Any = loader().sumOf { problem ->
-        val nums = problem.dropLast(1).map(String::toList).rowColSwap().map { it.joinToString("").trim().toLong() }
-        if (problem.last().contains("*")) {
-            nums.fold(1L) { acc, n -> acc * n }
-        } else {
-            nums.sum()
-        }
+        problem.extractNumbers(true).solve(problem.last())
     } == 11744693538946
-    
+
+    private fun List<Long>.solve(opr: String): Long =
+        if (opr.contains("*")) {
+            fold(1L) { acc, n -> acc * n }
+        } else {
+            sum()
+        }
+
     private fun List<String>.extractNumbers(rotate: Boolean): List<Long> =
         if (rotate) {
             dropLast(1).map(String::toList).rowColSwap().map { it.joinToString("").trim().toLong() }
@@ -32,10 +30,6 @@ class Dec06 : PuzzleDayTester(6, 2025) {
             dropLast(1).map { it.trim().toLong() }    
         }
 
-    /**
-     * loader idea: read from all rows simultaneously at the same index
-     * if an entire column is blank, that's the break for the next problem
-     */
     private fun loader() = load().let { lines ->
         val rows = lines.size
         var idx = 0
