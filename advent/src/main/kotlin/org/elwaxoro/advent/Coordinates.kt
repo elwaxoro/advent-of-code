@@ -439,6 +439,17 @@ data class Coord3D(val x: Int = 0, val y: Int = 0, val z: Int = 0, val w: Int = 
     fun subtract(that: Coord3D): Coord3D = Coord3D(x - that.x, y - that.y, z - that.z, w)
     fun manhattan(that: Coord3D): Int = abs(x - that.x) + abs(y - that.y) + abs(z - that.z)
 
+    /**
+     * Straight line / euclidean distance
+     */
+    fun distance(that: Coord3D): Double {
+        val dx = this.x - that.x + 0.0
+        val dy = this.y - that.y + 0.0
+        val dz = this.z - that.z + 0.0
+
+        return sqrt(dx * dx + dy * dy + dz * dz)
+    }
+    
     fun toMatrix(): Matrix4 = Matrix4(
         1, 0, 0, x,
         0, 1, 0, y,
