@@ -13,10 +13,7 @@ class Dec08 : PuzzleDayTester(8, 2025) {
     private val distancePairs =  junctions.combinations(2).map { (a, b) ->
         (a to b) to a.distance(b)
     }.sortedBy { it.second }
-    
-    /**
-     * 24360
-     */
+
     override fun part1(): Any {
         val sets = mutableListOf<Set<Coord3D>>()
         distancePairs.take(1000).forEach { (pair, _) ->
@@ -25,9 +22,6 @@ class Dec08 : PuzzleDayTester(8, 2025) {
         return sets.sortedByDescending { it.size }.take(3).fold(1L) { acc, set -> acc * set.size } == 24360L
     }
 
-    /**
-     * 2185817796
-     */
     override fun part2(): Any = loader().let { junctions ->
         val distancePairs = junctions.combinations(2).map { (a, b) ->
             (a to b) to a.distance(b)
