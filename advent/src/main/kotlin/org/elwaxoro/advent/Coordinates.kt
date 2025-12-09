@@ -1,5 +1,6 @@
 package org.elwaxoro.advent
 
+import java.awt.geom.Rectangle2D
 import kotlin.math.*
 
 /**
@@ -275,7 +276,14 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
         } else {
             throw IllegalStateException("No direction possible: $this vs $that")
         }
+
+    /**
+     * area of a rectangle described by 2 Coords INCLUDING the Coords themselves
+     */
+    fun areaI(that: Coord): Long = (abs(that.x - x) + 1L) * (abs(that.y - y) + 1L)
 }
+
+fun Pair<Coord, Coord>.toRectangle2D() = Rectangle2D.Double().apply { setFrameFromDiagonal(first.x.toDouble(), first.y.toDouble(), second.x.toDouble(), second.y.toDouble()) }
 
 /**
  * "x,y" formatted string to a Coord(x, y)
