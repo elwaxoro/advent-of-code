@@ -2,6 +2,7 @@ package org.elwaxoro.advent
 
 import java.math.BigInteger
 import java.security.MessageDigest
+import java.util.Collections
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -236,3 +237,18 @@ fun <T> Iterable<T>.permutations(length: Int? = null): Sequence<List<T>> =
 operator fun <T> List<T>.component6() = this[5]
 operator fun <T> List<T>.component7() = this[6]
 operator fun <T> List<T>.component8() = this[7]
+
+/**
+ * From a through b inclusive, reverse a subsection of the given list in place
+ */
+fun <T> MutableList<T>.reverseSpan(a: Int, b: Int) {
+    val i = (a..a + (b - a) / 2)
+    val j = if (b - a % 2 == 0) {
+        (b downTo a + (b - a) / 2)
+    } else {
+        (b downTo 1 + a + (b - a) / 2)
+    }
+    i.zip(j).forEach { (x, y) ->
+        Collections.swap(this, x, y)
+    }
+}
