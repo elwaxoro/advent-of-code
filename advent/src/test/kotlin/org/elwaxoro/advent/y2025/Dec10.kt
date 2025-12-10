@@ -19,16 +19,11 @@ class Dec10 : PuzzleDayTester(10, 2025) {
     private fun loader() = load().map { line ->
         val (l, b, j) = regex.find(line)!!.destructured
         val lights = l.map { c -> 0.takeIf { c == '.' } ?: 1 }
-        val buttons = b.split(" ").map {
-            it.replace("(", "").replace(")", "").split(",").map { it.toInt() }.let { digits ->
-                val spots = MutableList(lights.size) { 0 }
-                digits.forEach { d -> spots[d] = 1 }
-                spots.toBinaryInt()
-            }
+        val intButtons = b.split(" ").map { it.replace("(", "").replace(")", "").split(",").map { it.toInt() }}
+        val buttons = intButtons.map { digits ->
+            digits.fold(MutableList(lights.size) { 0 }) { acc, i -> acc.apply { this[i] = 1 } }.toBinaryInt()
         }
-        val buttons2 = b.split(" ").map {
-            it.replace("(", "").replace(")", "").split(",").map { it.toInt() }.toSet()
-        }
+        val buttons2 = intButtons.map { it.toSet()}
         val joltage = j.split(",").map { it.toInt() }
         Machine(lights.toBinaryInt(), buttons, buttons2, joltage)
     }
