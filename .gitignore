@@ -4,3 +4,4 @@ build
 out/
 gradlew.bat
 .DS_Store
+z3

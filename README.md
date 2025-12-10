@@ -41,3 +41,11 @@ This lets you separate the real input file from the samples (which can vary part
 
 ## Disclaimers
 Running the code for previous days / years isn't guaranteed to work or give correct output. Same goes for some of the helper functions. Most things *should* work, but ymmv! I tend to solve these quickly, then come back later to refactor. Sometimes the refactor breaks it and then I run out of time to fight with it, so it stays broken. Good luck!
+
+## Z3 Setup / Usage
+When a puzzle requires theorem proving (or falls easily into that category), Z3 may be installed and used directly within this repo.
+Install steps:
+1. Download Z3 from https://github.com/Z3Prover/z3
+2. Unzip into `advent-of-code/z3`
+3. Uncomment Z3 references from `advent/build.gradle.kts`
+4. If on OSX arm64, I needed to run `install_name_tool -change libz3.dylib @loader_path/libz3.dylib libz3java.dylib` to correctly link the libraries in `advent-of-code/z3/bin`

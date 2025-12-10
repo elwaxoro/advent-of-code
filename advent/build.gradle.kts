@@ -15,6 +15,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2")
     implementation("com.google.guava:guava:33.5.0-jre")
+    //implementation(files("../z3/bin/com.microsoft.z3.jar"))
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
@@ -26,6 +27,11 @@ java {
         languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
+
+// use for Z3 solutions
+//tasks.test {
+//    systemProperty("java.library.path", "../z3/bin/")
+//}
 
 testing {
     suites {
