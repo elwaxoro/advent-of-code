@@ -48,4 +48,4 @@ Install steps:
 1. Download Z3 from https://github.com/Z3Prover/z3
 2. Unzip into `advent-of-code/z3`
 3. Uncomment Z3 references from `advent/build.gradle.kts`
-4. If on OSX arm64, I needed to run `install_name_tool -change libz3.dylib @loader_path/libz3.dylib libz3java.dylib` to correctly link the libraries in `advent-of-code/z3/bin`
+4. If on OSX arm64, you may need to run `install_name_tool -change libz3.dylib @loader_path/libz3.dylib libz3java.dylib` to correctly link the libraries in `advent-of-code/z3/bin`
