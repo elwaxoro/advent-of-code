@@ -14,7 +14,7 @@ class Dec11 : PuzzleDayTester(11, 2025) {
     override fun part1(): Any = dfs("you", "out", loader()) == 746L
 
     /**
-     * idea: we don't care about intermediate steps in the path at all, just did we visit dac and fft before going out?
+     * idea: we don't care about full path at all, just did we visit dac and fft before going out?
      * count up svr -> dac/fft -> fft/dac -> out as separate stages then combine at the end
      * NOTE: all routes must be svr -> dac -> fft -> out OR svr -> fft -> dac -> out for a given puzzle input otherwise there would be a loop and we can't solve that
      */
