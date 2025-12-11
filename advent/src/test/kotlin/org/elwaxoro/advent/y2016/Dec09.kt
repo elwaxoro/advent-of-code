@@ -47,16 +47,6 @@ class Dec09 : PuzzleDayTester(9, 2016) {
 
     private val memo = mutableMapOf<String, Long>()
 
-    /**
-     * Quick and dirty memoization
-     * HashMap was throwing ConcurrentModificationException so just make my own. with blackjack! and hookers!
-     */
     private fun computeIfAbsent(key: String, compute: () -> Long): Long =
-        if (memo.containsKey(key)) {
-            memo.getValue(key)
-        } else {
-            val result = compute.invoke()
-            memo[key] = result
-            result
-        }
+        memo.getOrPut(key) { compute() }
 }
