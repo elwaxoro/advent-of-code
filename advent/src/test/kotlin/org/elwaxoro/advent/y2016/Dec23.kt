@@ -10,19 +10,24 @@ class Dec23: PuzzleDayTester(23, 2016) {
 
     override fun part1(): Any = load().toMutableList().solve(
         mutableMapOf(
-            "a" to 0,
+            "a" to 7,
+            "b" to 0,
+            "c" to 0,
+            "d" to 0,
+        )
+    ) == 12560
+
+    override fun part2(): Any = load().toMutableList().solve(
+        mutableMapOf(
+            "a" to 12,
             "b" to 0,
             "c" to 0,
             "d" to 0,
         )
     )
 
-    override fun part2(): Any {
-        return "TODO!"
-    }
-
     private fun MutableList<String>.solve(r: MutableMap<String, Int>): Int {
-        return 1 // TODO
+//        return 1 // TODO
         var i = 0
         while (i < this.size) {
             val s = this[i].split(" ")
@@ -30,6 +35,7 @@ class Dec23: PuzzleDayTester(23, 2016) {
             when (s[0]) {
                 "tgl" -> {
                     // instruction modifier!
+                    // tgl X
                     val target = r.getOrInt(s[1]) + i
                     if (target < this.size) {
                         val instruction = this[target]
@@ -48,27 +54,22 @@ class Dec23: PuzzleDayTester(23, 2016) {
                                 this[target] = instruction.replace(split[0], "jnz")
                             }
                         }
+//                        println("changed $instruction into ${this[target]}")
                     } else {
 //                        println("tried to toggle out of bounds: $target")
                     }
                     i++
                 }
                 "cpy" -> {
-                    if (r.containsKey(s[2])) {
-                        r[s[2]] = r.getOrInt(s[1])
-                    }
+                    r[s[2]] = r.getOrInt(s[1])
                     i++
                 }
                 "inc" -> {
-                    if (r.containsKey(s[1])) {
-                        r[s[1]] = r[s[1]]!! + 1
-                    }
+                    r[s[1]] = r[s[1]]!! + 1
                     i++
                 }
                 "dec" -> {
-                    if (r.containsKey(s[1])) {
-                        r[s[1]] = r[s[1]]!! - 1
-                    }
+                    r[s[1]] = r[s[1]]!! - 1
                     i++
                 }
                 "jnz" -> {

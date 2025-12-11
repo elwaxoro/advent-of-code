@@ -177,6 +177,11 @@ infix fun Int.pow(exponent: Int): Long = toDouble().pow(exponent).toLong()
 infix fun Int.pow(exponent: Long): Long = toDouble().pow(exponent.toDouble()).toLong()
 infix fun Long.xor(other: Int): Long = this xor other.toLong()
 
+// sum but for multiply
+fun List<Long>.multiply() = fold(1L) { a, b -> a * b }
+// sum but for multiply
+fun List<Int>.multiply() = fold(1) { a, b -> a * b }
+
 fun <T> List<List<T>>.cartesianProduct(): List<List<T>> =
     drop(1).fold(first().map { listOf(it) }) { acc, set ->
         acc.flatMap { list ->
