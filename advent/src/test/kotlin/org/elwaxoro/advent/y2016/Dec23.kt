@@ -4,7 +4,6 @@ import org.elwaxoro.advent.PuzzleDayTester
 
 /**
  * Day 23: Safe Cracking
- * 7 eggs on painting
  */
 class Dec23: PuzzleDayTester(23, 2016) {
 
@@ -17,6 +16,9 @@ class Dec23: PuzzleDayTester(23, 2016) {
         )
     ) == 12560
 
+    /**
+     * Got some help here to make it not run forever
+     */
     override fun part2(): Any = load().toMutableList().solve(
         mutableMapOf(
             "a" to 12,
@@ -27,7 +29,6 @@ class Dec23: PuzzleDayTester(23, 2016) {
     )
 
     private fun MutableList<String>.solve(r: MutableMap<String, Int>): Int {
-//        return 1 // TODO
         var i = 0
         while (i < this.size) {
             val s = this[i].split(" ")
@@ -61,8 +62,18 @@ class Dec23: PuzzleDayTester(23, 2016) {
                     i++
                 }
                 "cpy" -> {
-                    r[s[2]] = r.getOrInt(s[1])
-                    i++
+                    // cpy X Y / inc A / dec Y / jnz Y -2 / dec B / jnz B -5
+                    // is A += X * B. Part 2 counts this up to 12!, one inc at a time.
+                    val mul = multiply(i)
+                    if (mul != null && r[mul.factorReg]!! > 0) {
+                        r[mul.into] = r[mul.into]!! + r.getOrInt(s[1]) * r[mul.factorReg]!!
+                        r[s[2]] = 0
+                        r[mul.factorReg] = 0
+                        i += 6
+                    } else {
+                        r[s[2]] = r.getOrInt(s[1])
+                        i++
+                    }
                 }
                 "inc" -> {
                     r[s[1]] = r[s[1]]!! + 1
@@ -87,13 +98,30 @@ class Dec23: PuzzleDayTester(23, 2016) {
         return r["a"]!!
     }
     
-    private fun String.isInt(): Boolean =
-        try {
-            this.toInt()
-            true
-        } catch (ex: Exception) {
-            false
+    /**
+     * The add loop above `tgl` multiplies. Everything else is the factorial
+     * countdown plus a final `94 * 80` added onto `a` (7! + 7520 = 12560).
+     */
+    private fun List<String>.multiply(i: Int): Mul? {
+        if (i + 5 >= size) return null
+        val inc = this[i + 1].split(" ")
+        val decY = this[i + 2].split(" ")
+        val jnzY = this[i + 3].split(" ")
+        val decB = this[i + 4].split(" ")
+        val jnzB = this[i + 5].split(" ")
+        val y = this[i].split(" ")[2]
+        if (inc.size == 2 && inc[0] == "inc" &&
+            decY.size == 2 && decY[0] == "dec" && decY[1] == y &&
+            jnzY.size == 3 && jnzY[0] == "jnz" && jnzY[1] == y && jnzY[2] == "-2" &&
+            decB.size == 2 && decB[0] == "dec" &&
+            jnzB.size == 3 && jnzB[0] == "jnz" && jnzB[1] == decB[1] && jnzB[2] == "-5"
+        ) {
+            return Mul(inc[1], decB[1])
         }
+        return null
+    }
+
+    private data class Mul(val into: String, val factorReg: String)
 
     private fun Map<String, Int>.getOrInt(x: String) = this[x] ?: x.toInt()
     
