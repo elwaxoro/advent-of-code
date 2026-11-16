@@ -4,11 +4,16 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.test.Test
 import kotlin.test.assertNotEquals
+import org.junit.jupiter.api.Assumptions.assumeTrue
 
 /**
  * Extend PuzzleDayTester with your puzzle for the day!
  * Puzzles generally come in two parts, so extend part1() and part2() as you go
  * Run your class as a unit test to get that sweet sweet output
+ *
+ * Puzzle inputs stay on your machine (they are gitignored). A test that loads a missing
+ * input is skipped, so `gradle test` stays green without them. Drop the file in place
+ * and run that day to execute it.
  */
 abstract class PuzzleDayTester(val day: Int, val year: Int) {
 
@@ -42,8 +47,13 @@ abstract class PuzzleDayTester(val day: Int, val year: Int) {
     /**
      * Default loader: Loads whatever the path points to into a single string
      * Generally just call "load" instead, but this can be useful for loading multi-line JSON or something
+     *
+     * Missing inputs are skipped rather than failed. Advent of Code inputs are not checked in.
      */
-    fun loadText(path: Path): String = path.toUri().toURL().readText()
+    fun loadText(path: Path): String {
+        assumeTrue(path.toFile().exists()) { "Puzzle input is not in the repo: $path" }
+        return path.toUri().toURL().readText()
+    }
 
     /**
      * Helper: gets the absolute path for the given puzzle day
