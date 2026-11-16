@@ -23,9 +23,11 @@ By default, these tests fail till they're implemented. Any return counts as pass
 Since the test doesn't know the right answer, check the output for what to copy into the advent of code test boxes
 
 ## Input files
-Input files should go in test/resources based on year and date like `advent/src/test/resources/2022/Dec01.txt`
+Puzzle inputs are unique to your Advent of Code account and are not committed. Anything matching `advent/src/test/resources/**/*.txt` is gitignored.
 
-Note: input files are totally optional! Only use them if it makes sense for the puzzle you're solving
+Put the file for the day you are solving at `advent/src/test/resources/2022/Dec01.txt` (create the year directory if it is not there yet). Input files are optional; only use them if the puzzle needs them.
+
+`./gradlew test` skips any part that tries to load a missing input, so the suite passes with no input files checked in. Run the day's test class after the file is in place and that implementation runs as usual.
 
 PuzzleDayTester has a `load` function to help find them and parse them in a simple way (one string per newline by default)
 

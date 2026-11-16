@@ -5,3 +5,6 @@ out/
 gradlew.bat
 .DS_Store
 z3
+
+# Advent of Code puzzle inputs are unique per account and must not be committed
+advent/src/test/resources/**/*.txt
