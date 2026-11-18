@@ -24,6 +24,17 @@ fun List<Int>.toBinaryInt(): Int = joinToString("").toInt(2)
 fun List<Int>.toBinaryLong(): Long = joinToString("").toLong(2)
 
 /**
+ * starting from a hex char (0-9a-f), produce 4 bit binary string
+ * 0 = 0000
+ * f = 1111
+ */
+fun hexCharTo4BitBinary(hexChar: Char): String {
+    return hexChar.digitToInt(16)
+        .toString(2)
+        .padStart(4, '0')
+}
+
+/**
  * 0s become 1s, 1s become 0s
  */
 fun List<Int>.bitFlip(): List<Int> = map {
