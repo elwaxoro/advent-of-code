@@ -1,6 +1,9 @@
 package org.elwaxoro.advent.y2017
 
+import org.elwaxoro.advent.Coord
+import org.elwaxoro.advent.Dir
 import org.elwaxoro.advent.PuzzleDayTester
+import org.elwaxoro.advent.Turn
 import kotlin.math.abs
 
 /**
@@ -52,8 +55,28 @@ class Dec03: PuzzleDayTester(3, 2017)  {
     }
 
     /**
-     * welp. being tricky in part 1 doesn't help me here.
-     * thinking we need a full generator here
+     * 266330
+     * same spiral, but each cell stores the sum of its already-written neighbors (diagonals included)
+     * walk two legs at each length, then grow the leg: 1,1,2,2,3,3,... turning left between legs
+     * puzzle input is still 265149; return the first value written that is larger than it
      */
-    override fun part2(): Any = "Someday!"
+    override fun part2(): Any {
+        val target = 265149
+        val memory = mutableMapOf(Coord(0, 0) to 1)
+        var pos = Coord(0, 0)
+        var dir = Dir.E
+        var leg = 1
+        while (true) {
+            repeat(2) {
+                repeat(leg) {
+                    pos = pos.move(dir)
+                    val sum = pos.neighbors9(includeSelf = false).flatten().sumOf { memory[it] ?: 0 }
+                    if (sum > target) return sum
+                    memory[pos] = sum
+                }
+                dir = dir.turn(Turn.L)
+            }
+            leg++
+        }
+    }
 }

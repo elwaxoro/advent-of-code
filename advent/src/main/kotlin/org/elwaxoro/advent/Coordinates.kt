@@ -415,6 +415,7 @@ enum class HexDir { E, W, NE, NW, SE, SW }
 /**
  * Hex coordinates based on https://www.redblobgames.com/grids/hexagons/
  * Uses cube coordinates
+ * This is "pointy-top orientation"
  */
 data class Hex(val x: Int, val y: Int, val z: Int) {
 
@@ -429,6 +430,8 @@ data class Hex(val x: Int, val y: Int, val z: Int) {
         }
 
     fun neighbors(): List<Hex> = HexDir.entries.map { move(it) }
+
+    fun distance(that: Hex): Int = (abs(x - that.x) + abs(y - that.y) + abs(z - that.z)) / 2
 }
 
 /**
