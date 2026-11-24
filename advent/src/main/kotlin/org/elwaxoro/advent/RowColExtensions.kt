@@ -3,7 +3,9 @@ package org.elwaxoro.advent
 /*
  * Extensions for messing with row/column based list of lists
  * Ex: [ [rowAcol0, rowAcol1, rowAcol2], [rowBcol0, rowBcol1, rowBcol2]]
- * IMPORTANT! if thinking of the list of lists as a coordinate grid, row = y and col = x
+ * IMPORTANT! if thinking of the list of lists as a coordinate grid, row = y and col = x generally increasing y is moving "down" the array instead of "north"
+ * the top left of the lists will be 0, 0
+ * if you need bottom left of array to be 0, 0 then just reverse the list of rows first
  */
 
 /**

@@ -49,7 +49,7 @@ class Dec18 : PuzzleDayTester(18, 2023) {
         dug.plus(dug.last().move(newHeading, dist))
     }.let { dug ->
         val area = dug.shoelaceArea() + 2 // TODO why does adding + 2 fix this? why is everything so hard
-        val border = dug.zipWithNext { a, b -> a.taxiDistance(b) }.sum().toDouble()
-        picksTheorem(area, border).toLong()
+        val border = dug.zipWithNext { a, b -> a.taxiDistance(b) }.sum()
+        picksTheorem(area, border)
     }
 }

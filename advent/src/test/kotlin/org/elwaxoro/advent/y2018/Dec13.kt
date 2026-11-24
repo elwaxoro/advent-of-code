@@ -109,6 +109,7 @@ class Dec13 : PuzzleDayTester(13, 2018) {
                         Turn.L -> Turn.A
                         Turn.A -> Turn.R
                         Turn.R -> Turn.L
+                        Turn.B -> Turn.B
                     }
                 }
 

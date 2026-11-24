@@ -43,26 +43,32 @@ enum class Dir {
                 Turn.R -> E
                 Turn.L -> W
                 Turn.A -> N
+                Turn.B -> S
             }
 
             S -> when (t) {
                 Turn.R -> W
                 Turn.L -> E
                 Turn.A -> S
+                Turn.B -> N
             }
 
             E -> when (t) {
                 Turn.R -> S
                 Turn.L -> N
                 Turn.A -> E
+                Turn.B -> W
             }
 
             W -> when (t) {
                 Turn.R -> N
                 Turn.L -> S
                 Turn.A -> W
+                Turn.B -> E
             }
         }
+
+    fun opposite(): Dir = turn(Turn.B)
 
     fun toChar(): Char = when (this) {
         N -> 'N'
@@ -95,7 +101,8 @@ enum class Dir {
 enum class Turn {
     R,
     L,
-    A // straight ahead
+    A, // straight ahead
+    B // back or 180 turn
 }
 
 /**
@@ -158,32 +165,23 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
     /**
      * Gets the direction of an adjacent Coord
      */
-    fun edge(that: Coord): Dir =
-        if (x == that.x) {
-            if (y == that.y - 1) {
-                Dir.N
-            } else {
-                Dir.S
-            }
-        } else if (y == that.y) {
-            if (x == that.x - 1) {
-                Dir.E
-            } else {
-                Dir.W
-            }
-        } else {
-            throw IllegalStateException("Coord $that is not adjacent to $this")
-        }
+    fun edge(that: Coord): Dir = when {
+        x == that.x && y == that.y - 1 -> Dir.N
+        x == that.x && y == that.y + 1 -> Dir.S
+        y == that.y && x == that.x - 1 -> Dir.E
+        y == that.y && x == that.x + 1 -> Dir.W
+        else -> throw IllegalStateException("Coord $that is not adjacent to $this")
+    }
 
     /**
      * Simplistic rotations for multiples of 90 degrees only
      */
     fun rotate(rotation: Int): Coord =
-        when (rotation % 360) {
+        when (Math.floorMod(rotation, 360)) {
             0 -> this
-            90 -> Coord(y, x * -1, d)
-            180 -> Coord(x * -1, y * -1, d)
-            270 -> Coord(y * -1, x, d)
+            90 -> Coord(y, -x, d)
+            180 -> Coord(-x, -y, d)
+            270 -> Coord(-y, x, d)
             else -> throw IllegalStateException("Coord $this does not support rotation $rotation")
         }
 
@@ -193,20 +191,22 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
      * [Coord(x=0, y=0), Coord(x=0, y=1), Coord(x=0, y=2), Coord(x=1, y=0), Coord(x=1, y=1), Coord(x=1, y=2), Coord(x=2, y=0), Coord(x=2, y=1), Coord(x=2, y=2)]
      */
     fun enumerateRectangle(toCoord: Coord): List<Coord> {
-        val xs = listOf(x, toCoord.x).sorted()
-        val ys = listOf(y, toCoord.y).sorted()
-        return (xs[0]..xs[1]).map { mx ->
-            (ys[0]..ys[1]).map { my ->
+        val minX = min(x, toCoord.x)
+        val maxX = max(x, toCoord.x)
+        val minY = min(y, toCoord.y)
+        val maxY = max(y, toCoord.y)
+        return (minX..maxX).flatMap { mx ->
+            (minY..maxY).map { my ->
                 Coord(mx, my, d)
             }
-        }.flatten()
+        }
     }
 
     /**
      * With this coord at the center, get all coords within a rectangle where x or y is dist away
      * (corners will be x+dist, y+dist and x-dist, y-dist)
      */
-    fun enumerateRectangle(dist: Int): List<Coord> = add(dist, dist).enumerateRectangle(add(dist * -1, dist * -1))
+    fun enumerateRectangle(dist: Int): List<Coord> = add(dist, dist).enumerateRectangle(add(-dist, -dist))
 
     /**
      * Return the list of all coords in a line from this coord to the target coord, including both start and end coords
@@ -225,13 +225,14 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
     /**
      * Pythagoras figured this out so we don't have to
      */
-    fun distance(to: Coord): Double = sqrt((to.x - x).toDouble().pow(2) + (to.y - y).toDouble().pow(2))
+    fun distance(to: Coord): Double = hypot((to.x - x).toDouble(), (to.y - y).toDouble())
 
     /**
      * Manhattan distance / taxicab distance
      * https://en.wikipedia.org/wiki/Taxicab_geometry
      */
     fun taxiDistance(to: Coord): Int = abs(to.x - x) + abs(to.y - y)
+    fun manhattan(to: Coord): Int = taxiDistance(to)
 
     /**
      * Angle from this coord to that coord, in degrees
@@ -258,24 +259,12 @@ data class Coord(val x: Int = 0, val y: Int = 0, val d: Char? = null) {
      * If other coord is not exactly in any direction, an exception is thrown
      * If other coord is at the same position, an exception is thrown
      */
-    fun dirTo(that: Coord): Dir =
-        if (x == that.x && y == that.y) {
-            throw IllegalStateException("No direction possible: $this == $that ")
-        } else if (x == that.x) {
-            if (y < that.y) {
-                Dir.N
-            } else {
-                Dir.S
-            }
-        } else if (y == that.y) {
-            if (x < that.x) {
-                Dir.E
-            } else {
-                Dir.W
-            }
-        } else {
-            throw IllegalStateException("No direction possible: $this vs $that")
-        }
+    fun dirTo(that: Coord): Dir = when {
+        this == that -> throw IllegalStateException("No direction possible: $this == $that")
+        x == that.x -> if (y < that.y) Dir.N else Dir.S
+        y == that.y -> if (x < that.x) Dir.E else Dir.W
+        else -> throw IllegalStateException("No direction possible: $this vs $that")
+    }
 
     /**
      * area of a rectangle described by 2 Coords INCLUDING the Coords themselves
@@ -403,12 +392,13 @@ fun Collection<Coord>.printify(full: Char = '#', empty: Char = '.', invert: Bool
  * Use invert to have the last String be y=0, bottom left will be 0,0
  * Invert is useful when working with N,S,E,W to have Y increase while going "up"
  */
-fun List<String>.parseCoords(invert: Boolean = false, filter: Set<Char> = setOf(), blank: Boolean = false): Set<Coord> = flatMapIndexed { r, s ->
-    val y = r.takeUnless { invert } ?: (size - r + 1)
-    s.mapIndexedNotNull { x, d ->
-        Coord(x, y, d.takeUnless { blank }).takeUnless { filter.contains(d) }
-    }
-}.toSet()
+fun List<String>.parseCoords(invert: Boolean = false, filter: Set<Char> = setOf(), blank: Boolean = false): Set<Coord> =
+    flatMapIndexed { r, s ->
+        val y = if (invert) size - 1 - r else r
+        s.mapIndexedNotNull { x, d ->
+            Coord(x, y, d.takeUnless { blank }).takeUnless { filter.contains(d) }
+        }
+    }.toSet()
 
 enum class HexDir { E, W, NE, NW, SE, SW }
 
@@ -450,14 +440,17 @@ data class Coord3D(val x: Int = 0, val y: Int = 0, val z: Int = 0, val w: Int = 
     fun subtract(that: Coord3D): Coord3D = Coord3D(x - that.x, y - that.y, z - that.z, w)
     fun manhattan(that: Coord3D): Int = abs(x - that.x) + abs(y - that.y) + abs(z - that.z)
 
+    operator fun plus(that: Coord3D) = this.add(that)
+    operator fun minus(that: Coord3D) = this.subtract(that)
+    operator fun times(scalar: Int) = Coord3D(x * scalar, y * scalar, z * scalar, w)
+
     /**
      * Straight line / euclidean distance
      */
     fun distance(that: Coord3D): Double {
-        val dx = this.x - that.x + 0.0
-        val dy = this.y - that.y + 0.0
-        val dz = this.z - that.z + 0.0
-
+        val dx = (this.x - that.x).toDouble()
+        val dy = (this.y - that.y).toDouble()
+        val dz = (this.z - that.z).toDouble()
         return sqrt(dx * dx + dy * dy + dz * dz)
     }
     
@@ -476,16 +469,32 @@ data class Coord3D(val x: Int = 0, val y: Int = 0, val z: Int = 0, val w: Int = 
         Coord3D(x, y, z + 1),
         Coord3D(x, y, z - 1),
     )
+
+    fun absMagnitude() = abs(x) + abs(y) + abs(z)
 }
 
 fun Collection<Coord3D>.bounds(pad: Int = 0): Bounds3D {
-    val maxX = maxOf { it.x } + pad
-    val maxY = maxOf { it.y } + pad
-    val maxZ = maxOf { it.z } + pad
-    val minX = minOf { it.x } - pad
-    val minY = minOf { it.y } - pad
-    val minZ = minOf { it.z } - pad
-    return Bounds3D(Coord3D(minX, minY, minZ), Coord3D(maxX, maxY, maxZ))
+    require(isNotEmpty()) { "Cannot compute bounds of an empty collection" }
+    var minX = Int.MAX_VALUE
+    var minY = Int.MAX_VALUE
+    var minZ = Int.MAX_VALUE
+    var maxX = Int.MIN_VALUE
+    var maxY = Int.MIN_VALUE
+    var maxZ = Int.MIN_VALUE
+
+    for ((x, y, z) in this) {
+        if (x < minX) minX = x
+        if (y < minY) minY = y
+        if (z < minZ) minZ = z
+        if (x > maxX) maxX = x
+        if (y > maxY) maxY = y
+        if (z > maxZ) maxZ = z
+    }
+
+    return Bounds3D(
+        min = Coord3D(minX - pad, minY - pad, minZ - pad),
+        max = Coord3D(maxX + pad, maxY + pad, maxZ + pad)
+    )
 }
 
 /**
@@ -498,32 +507,34 @@ data class Bounds3D(val min: Coord3D, val max: Coord3D) {
         check(min.z <= max.z) { "Z: ${min.z} must be <= ${max.z} [$this]" }
     }
 
-    fun size(): Long = abs(max.x - min.x).toLong() * abs(max.y - min.y) * abs(max.z - min.z)
+    fun size(): Long = (max.x - min.x + 1L) * (max.y - min.y + 1L) * (max.z - min.z + 1L)
 
-    fun contains(coord: Coord3D): Boolean =
-        coord.x <= max.x && coord.x >= min.x
-                && coord.y <= max.y && coord.y >= min.y
-                && coord.z <= max.z && coord.z >= min.z
+    operator fun contains(coord: Coord3D): Boolean =
+        coord.x in min.x..max.x &&
+                coord.y in min.y..max.y &&
+                coord.z in min.z..max.z
 
-    // TODO verify
-    fun intersects(that: Bounds3D): Boolean = contains(that.min) || contains(that.max) || that.contains(min) || that.contains(max)
+    fun intersects(that: Bounds3D): Boolean =
+        min.x <= that.max.x && max.x >= that.min.x &&
+                min.y <= that.max.y && max.y >= that.min.y &&
+                min.z <= that.max.z && max.z >= that.min.z
 
-    // TODO verify
-    fun intersection(that: Bounds3D): Bounds3D =
-        Bounds3D(
+    fun intersection(that: Bounds3D): Bounds3D? =
+        if (!intersects(that)) null
+        else Bounds3D(
             min = Coord3D(max(min.x, that.min.x), max(min.y, that.min.y), max(min.z, that.min.z)),
             max = Coord3D(min(max.x, that.max.x), min(max.y, that.max.y), min(max.z, that.max.z))
         )
 
-    // TODO verify
-    fun enumerateCube(): List<Coord3D> =
-        (min.x..max.x).flatMap { x ->
-            (min.y..max.y).flatMap { y ->
-                (min.z..max.z).map { z ->
-                    Coord3D(x, y, z)
+    fun enumerateCube(): Sequence<Coord3D> = sequence {
+        for (x in min.x..max.x) {
+            for (y in min.y..max.y) {
+                for (z in min.z..max.z) {
+                    yield(Coord3D(x, y, z))
                 }
             }
         }
+    }
 }
 
 /**
@@ -653,13 +664,13 @@ data class LCoord(val x: Long, val y: Long) {
  * NOTE2: only used this for one puzzle and had to add + 2 to the output to get the right answer
  * https://en.wikipedia.org/wiki/Shoelace_formula
  */
-fun List<LCoord>.shoelaceArea(): Double {
-    val n = size
-    var a = 0.0
-    for (i in 0 until n - 1) {
-        a += this[i].x * this[i + 1].y - this[i + 1].x * this[i].y
+fun List<LCoord>.shoelaceArea(): Long {
+    var sum = 0L
+    for (i in indices) {
+        val j = (i + 1) % size
+        sum += this[i].x * this[j].y - this[j].x * this[i].y
     }
-    return abs(a + this[n - 1].x * this[0].y - this[0].x * this[n - 1].y) / 2.0
+    return abs(sum) / 2L
 }
 
 /**
@@ -667,6 +678,7 @@ fun List<LCoord>.shoelaceArea(): Double {
  * https://en.wikipedia.org/wiki/Pick%27s_theorem
  */
 fun picksTheorem(interior: Double, boundary: Double): Double = interior + (boundary / 2.0) - 1
+fun picksTheorem(interior: Long, boundary: Long): Long = interior + (boundary / 2L) + 1L
 
 data class Coord4D(val x: Int, val y: Int, val z: Int, val w: Int) {
 
