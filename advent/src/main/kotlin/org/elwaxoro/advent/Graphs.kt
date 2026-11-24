@@ -1,5 +1,7 @@
 package org.elwaxoro.advent
 
+import java.util.PriorityQueue
+
 /**
  * ad-hoc wrapper class for doing stuff with graphs based purely on
  * what's needed for past challenges with no thought given to future need
@@ -9,98 +11,88 @@ package org.elwaxoro.advent
  */
 data class Node(
     val name: String,
-    val canVisit: Boolean = true, // custom rules for a puzzle, indicates unexplored node
-    val canLeave: Boolean = true, // custom rules for a puzzle, indicates exit node
-    val canRevisit: Boolean = false // custom rules for a puzzle
+    val canVisit: Boolean = true,
+    val canLeave: Boolean = true,
+    val canRevisit: Boolean = false
 ) {
+    val edges = mutableMapOf<Node, Int>()
+    var parent: Node? = null
 
-    val edges = mutableMapOf<Node, Int>() // directly connected nodes, along with cost to visit them if applicable
-
-    var parent: Node? = null // omg what am I even doing. should really create a tree structure instead of hacking the node to do this :( this is separate so that edges can be children without circular trees
-
-    // Misc for various puzzles. Put whatever you want here
     var scratch: Int = 0
     var coord: Coord? = null
 
-    // helpers for dijkstra
-    var shortestPath = listOf<Node>()
+    var shortestPath: List<Node> = emptyList()
     var shortestDistance: Int = Int.MAX_VALUE
 
     override fun toString(): String = name
 
-    /**
-     * Edge cost to visit an adjacent node
-     */
-    fun cost(node: Node): Int = edges[node]!!
+    fun cost(node: Node): Int = edges[node] ?: error("No edge from $name to ${node.name}")
 
-    /**
-     * Add an adjacent node + cost to visit
-     */
     fun addEdge(node: Node, cost: Int = 0) {
         edges[node] = cost
     }
 
     /**
-     * Dijkstra it up!
-     * This call populates this node and all connected nodes with the shortest path from all other connected nodes to this node
-     * Output path and cost data are stored in each Node, this Node's path will be empty and cost will be zero
-     * NOTE: if the graph is not sufficiently connected, watch for empty paths and shortest distance = Int.MAX_VALUE
-     * DANGER: this is a mutating call so will only really work once for all nodes involved
+     * Resets Dijkstra state on this node and all reachable nodes so dijkstra() can be re-run safely
+     */
+    fun resetPaths(visited: MutableSet<Node> = mutableSetOf()) {
+        if (!visited.add(this)) return
+        shortestDistance = Int.MAX_VALUE
+        shortestPath = emptyList()
+        edges.keys.forEach { it.resetPaths(visited) }
+    }
+
+    /**
+     * PriorityQueue-backed Dijkstra from this node to all reachable nodes.
      */
     fun dijkstra() {
+        resetPaths()
         shortestDistance = 0
-        val settled: MutableSet<Node> = mutableSetOf()
-        val unsettled: MutableSet<Node> = mutableSetOf()
-        unsettled.add(this)
 
-        while (unsettled.isNotEmpty()) {
-            // always work on the shortest path first
-            unsettled.minByOrNull { it.shortestDistance }!!.let { node ->
-                // node goes from unsettled to settled
-                settled.add(unsettled.delete(node))
-                // all neighbors not already settled update their distances and go in the unsettled pile
-                unsettled.addAll(node.edges.keys.filterNot { settled.contains(it) }.map { it.calculateMinimumDistance(node) })
+        val settled = mutableSetOf<Node>()
+        val queue = PriorityQueue<Node>(compareBy { it.shortestDistance })
+        queue.add(this)
+
+        while (queue.isNotEmpty()) {
+            val current = queue.poll()
+            if (!settled.add(current)) continue
+
+            for ((neighbor, edgeCost) in current.edges) {
+                if (neighbor in settled) continue
+                val candidateDist = current.shortestDistance + edgeCost
+                if (candidateDist < neighbor.shortestDistance) {
+                    neighbor.shortestDistance = candidateDist
+                    neighbor.shortestPath = current.shortestPath + current
+                    queue.add(neighbor)
+                }
             }
         }
     }
 
-    /**
-     * dijkstra helper
-     */
-    private fun MutableSet<Node>.delete(node: Node): Node = node.also { remove(node) }
+    fun printify(): String = "$name: $scratch: ${edges.mapKeys { it.key.name }}"
 
     /**
-     * dijkstra helper
-     * If (other's shortest path + cost there to here) is better than this node's shortest path,
-     * replace this node's shortest path stuff
+     * Cycle-safe depth calculation
      */
-    private fun calculateMinimumDistance(other: Node): Node = this.also {
-        (other.shortestDistance + cost(other)).takeIf { it < shortestDistance }?.let { newShorterDistance ->
-            shortestDistance = newShorterDistance
-            shortestPath = other.shortestPath + other
-        }
-    }
-
-    fun printify(): String = "$name: $scratch: $edges"
-
-    /**
-     * Starting with this node as depth 0, recursively calculate the depth of all connected nodes
-     */
-    fun calculateAllDepths(depth: Int = 0) {
+    fun calculateAllDepths(depth: Int = 0, visited: MutableSet<Node> = mutableSetOf()) {
+        if (!visited.add(this)) return
         this.scratch = depth
-        edges.keys.forEach { it.calculateAllDepths(depth + 1) }
+        edges.keys.forEach { it.calculateAllDepths(depth + 1, visited) }
     }
 
     /**
-     * Starting with this Node, follow the parent links until one is null
-     * Returns a list of Nodes from this one to the root of the tree / graph
+     * Follow parent links to root (with cycle guard)
      */
-    fun traceRoot(path: List<Node> = listOf()): List<Node> =
-        if (parent == null) {
-            path.plus(this)
-        } else {
-            parent!!.traceRoot(path.plus(this))
+    fun traceRoot(): List<Node> {
+        val path = mutableListOf<Node>()
+        var curr: Node? = this
+        val seen = mutableSetOf<Node>()
+        while (curr != null && seen.add(curr)) {
+            path.add(curr)
+            curr = curr.parent
         }
+        return path
+    }
 }
 
 /**
@@ -189,6 +181,7 @@ class BronKerbosch<T>(private val neighbors: Map<T, Set<T>>) {
     private var bestR: Set<T> = emptySet()
 
     fun largestClique(): Set<T> {
+        bestR = emptySet()
         execute(neighbors.keys)
         return bestR
     }
@@ -199,19 +192,60 @@ class BronKerbosch<T>(private val neighbors: Map<T, Set<T>>) {
         x: Set<T> = emptySet()
     ) {
         if (p.isEmpty() && x.isEmpty()) {
-            // We have found a potential best R value, compare it to the best so far.
             if (r.size > bestR.size) bestR = r
-        } else {
-            val mostNeighborsOfPandX: T = (p + x).maxBy { neighbors.getValue(it).size }!!
-            val pWithoutNeighbors = p.minus(neighbors[mostNeighborsOfPandX]!!)
-            pWithoutNeighbors.forEach { v ->
-                val neighborsOfV = neighbors[v]!!
-                execute(
-                    p.intersect(neighborsOfV),
-                    r + v,
-                    x.intersect(neighborsOfV)
-                )
+            return
+        }
+
+        val pivot = (p + x).maxBy { neighbors[it]?.size ?: 0 }
+        val candidates = p - neighbors[pivot].orEmpty()
+
+        for (v in candidates) {
+            val neighborsOfV = neighbors[v].orEmpty()
+            execute(
+                p = p.intersect(neighborsOfV),
+                r = r + v,
+                x = x.intersect(neighborsOfV)
+            )
+        }
+    }
+}
+
+/**
+ * A generic stateless functional dijkstra/bfs that works with more things than just Node
+ * Example (weighted 2D grid where each cell's Int value is the cost to enter it):
+ * ```
+ * val cost = shortestPath(
+ *     start = Coord(0, 0),
+ *     isGoal = { it == Coord(maxX, maxY) },
+ *     neighbors = { pos ->
+ *         pos.neighbors()
+ *             .filter { it in grid }
+ *             .map { next -> next to grid[next] }
+ *     }
+ * )
+ * ```
+ */
+fun <S> shortestPath(
+    start: S,
+    isGoal: (S) -> Boolean,
+    neighbors: (S) -> Iterable<Pair<S, Int>>
+): Int? {
+    val dist = mutableMapOf(start to 0)
+    val queue = PriorityQueue<Pair<S, Int>>(compareBy { it.second })
+    queue.add(start to 0)
+
+    while (queue.isNotEmpty()) {
+        val (state, cost) = queue.poll()
+        if (isGoal(state)) return cost
+        if (cost > (dist[state] ?: Int.MAX_VALUE)) continue
+
+        for ((next, stepCost) in neighbors(state)) {
+            val newCost = cost + stepCost
+            if (newCost < (dist[next] ?: Int.MAX_VALUE)) {
+                dist[next] = newCost
+                queue.add(next to newCost)
             }
         }
     }
+    return null
 }

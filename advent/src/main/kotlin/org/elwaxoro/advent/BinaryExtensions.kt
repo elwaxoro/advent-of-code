@@ -15,13 +15,20 @@ package org.elwaxoro.advent
  * ex:
  * 6d9b3bf5bf5fc15c0e49081f9b160da6
  */
-fun ByteArray.toHexString() = joinToString("") { (0xFF and it.toInt()).toString(16).padStart(2, '0') }
+fun ByteArray.toHexString(): String = joinToString("") { (0xFF and it.toInt()).toString(16).padStart(2, '0') }
 
 /**
  * Takes a list of 1s and 0s and turns it into a single integer
  */
-fun List<Int>.toBinaryInt(): Int = joinToString("").toInt(2)
-fun List<Int>.toBinaryLong(): Long = joinToString("").toLong(2)
+fun Iterable<Int>.toBinaryInt(): Int = fold(0) { acc, bit ->
+    require(bit == 0 || bit == 1) { "Invalid bit: $bit" }
+    (acc shl 1) or bit
+}
+
+fun Iterable<Int>.toBinaryLong(): Long = fold(0L) { acc, bit ->
+    require(bit == 0 || bit == 1) { "Invalid bit: $bit" }
+    (acc shl 1) or bit.toLong()
+}
 
 /**
  * starting from a hex char (0-9a-f), produce 4 bit binary string
@@ -44,3 +51,5 @@ fun List<Int>.bitFlip(): List<Int> = map {
         else -> throw IllegalStateException("can't bit flip $it")
     }
 }
+
+fun String.hexToBinary(): String = map { hexCharTo4BitBinary(it) }.joinToString("")

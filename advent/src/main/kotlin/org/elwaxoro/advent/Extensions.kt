@@ -10,7 +10,20 @@ import kotlin.math.pow
 /**
  * Note: NOT sum of prime factors, just all factors
  */
-fun Int.sumOfFactors(): Int = (1..this).fold(0) { acc, i -> (acc + i).takeIf { this % i == 0 } ?: acc }
+fun Int.sumOfFactors(): Int {
+    if (this <= 0) return 0
+    var sum = 0
+    var i = 1
+    while (i * i <= this) {
+        if (this % i == 0) {
+            sum += i
+            val pair = this / i
+            if (pair != i) sum += pair
+        }
+        i++
+    }
+    return sum
+}
 
 /**
  * Nullable Long plusser, null defaults to 0
@@ -26,8 +39,10 @@ fun String.splitToInt(): List<Int> = map(Character::getNumericValue)
 /**
  * Creates a hex string MD5 hash of the input string
  */
-private val MD5 = MessageDigest.getInstance("MD5")
-fun String.md5(): String = BigInteger(1, MD5.digest(toByteArray())).toString(16).padStart(32, '0')
+fun String.md5(): String {
+    val digest = MessageDigest.getInstance("MD5").digest(toByteArray())
+    return BigInteger(1, digest).toString(16).padStart(32, '0')
+}
 
 /**
  * Replace matching values
@@ -49,31 +64,20 @@ fun IntProgression.padTo(newSize: Int): List<Int> = toList().padTo(newSize)
  * Find all range pairs with overlap and merge them
  * Note (0..9)(10..20) is considered an overlap and becomes (0..20)
  */
-fun MutableSet<LongRange>.mergeAllOverlap(): MutableSet<LongRange> {
-    do {
-        val count = size
-        findMerge()
-    } while (count != size)
-    return this
-}
+fun Iterable<LongRange>.mergeAllOverlap(): List<LongRange> {
+    val sorted = filterNot { it.isEmpty() }.sortedBy { it.first }
+    if (sorted.isEmpty()) return emptyList()
 
-/**
- * Find the first pair of ranges with overlap, merge them and return
- * Note (0..9)(10..20) is considered an overlap and becomes (0..20)
- */
-fun MutableSet<LongRange>.findMerge() {
-    forEach { a ->
-        forEach { b ->
-            if (a != b && a.last + 1 >= b.first && a.first <= b.first) {
-                val start = min(a.first, b.first)
-                val end = max(a.last, b.last)
-                remove(a)
-                remove(b)
-                add(LongRange(start, end))
-                return
-            }
+    val merged = mutableListOf(sorted.first())
+    for (current in sorted.drop(1)) {
+        val last = merged.last()
+        if (current.first <= last.last + 1L) {
+            merged[merged.lastIndex] = last.first..max(last.last, current.last)
+        } else {
+            merged.add(current)
         }
     }
+    return merged
 }
 
 /**
@@ -171,10 +175,33 @@ fun <K, V> Pair<K, V>.toEntry() = object : Map.Entry<K, V> {
     override val value: V = second
 }
 
-infix fun Long.pow(exponent: Int): Long = toDouble().pow(exponent).toLong()
-infix fun Long.pow(exponent: Long): Long = toDouble().pow(exponent.toDouble()).toLong()
-infix fun Int.pow(exponent: Int): Long = toDouble().pow(exponent).toLong()
-infix fun Int.pow(exponent: Long): Long = toDouble().pow(exponent.toDouble()).toLong()
+infix fun Long.pow(exponent: Int): Long {
+    require(exponent >= 0) { "Negative exponent not supported for Long: $exponent" }
+    var base = this
+    var exp = exponent
+    var result = 1L
+    while (exp > 0) {
+        if ((exp and 1) == 1) result *= base
+        base *= base
+        exp = exp ushr 1
+    }
+    return result
+}
+
+infix fun Int.pow(exponent: Int): Long = this.toLong() pow exponent
+
+infix fun Long.pow(exponent: Long): Long {
+    require(exponent >= 0L) { "Negative exponent not supported for Long: $exponent" }
+    return when (this) {
+        0L -> if (exponent == 0L) 1L else 0L
+        1L -> 1L
+        -1L -> if ((exponent and 1L) == 0L) 1L else -1L
+        else -> this pow Math.toIntExact(exponent)
+    }
+}
+
+infix fun Int.pow(exponent: Long): Long = this.toLong() pow exponent
+
 infix fun Long.xor(other: Int): Long = this xor other.toLong()
 
 // sum but for multiply
@@ -183,10 +210,9 @@ fun List<Long>.multiply() = fold(1L) { a, b -> a * b }
 fun List<Int>.multiply() = fold(1) { a, b -> a * b }
 
 fun <T> List<List<T>>.cartesianProduct(): List<List<T>> =
-    drop(1).fold(first().map { listOf(it) }) { acc, set ->
-        acc.flatMap { list ->
-            set.map { element -> list + element }
-        }
+    if (isEmpty()) emptyList()
+    else drop(1).fold(first().map { listOf(it) }) { acc, set ->
+        acc.flatMap { list -> set.map { element -> list + element } }
     }
 
 // found online as a translation of python's itertools function
@@ -239,9 +265,11 @@ fun <T> Iterable<T>.permutations(length: Int? = null): Sequence<List<T>> =
     }
 
 // kotlin only destructures up to 5, these add a few more
-operator fun <T> List<T>.component6() = this[5]
-operator fun <T> List<T>.component7() = this[6]
-operator fun <T> List<T>.component8() = this[7]
+operator fun <T> List<T>.component6(): T = get(5)
+operator fun <T> List<T>.component7(): T = get(6)
+operator fun <T> List<T>.component8(): T = get(7)
+operator fun <T> List<T>.component9(): T = get(8)
+operator fun <T> List<T>.component10(): T = get(9)
 
 /**
  * From a through b inclusive, reverse a subsection of the given list in place
