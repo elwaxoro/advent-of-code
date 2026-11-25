@@ -45,6 +45,22 @@ fun String.md5(): String {
 }
 
 /**
+ * Rotate a square List<String> 90 degrees clockwise
+ * conways's game of life stuff
+ * (dec21 2017)
+ */
+fun List<String>.rotate90(): List<String> =
+    indices.map { c ->
+        indices.reversed().map { r -> this[r][c] }.joinToString("")
+    }
+
+/**
+ * "flip" a square List<String> horizontally
+ * basically just reverse all the strings
+ */
+fun List<String>.flipHorizontal(): List<String> = map { it.reversed() }
+
+/**
  * Replace matching values
  */
 fun List<Int>.replace(oldInt: Int, newInt: Int): List<Int> = map { it.takeUnless { it == oldInt } ?: newInt }
